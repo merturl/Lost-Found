@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "79140477982",
+    "firebase_url": "https://memowebapp-a4b04.firebaseio.com",
+    "project_id": "memowebapp-a4b04",
+    "storage_bucket": "memowebapp-a4b04.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:79140477982:android:e87c08dfc84ca72b",
+        "android_client_info": {
+          "package_name": "com.jonghyeon.tutorial"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "79140477982-1dgf0djmq2195osl0e5t5mna854dpv08.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1IlsVBKduHkIjU-38Z4xgaXck0vcGe3Y"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
