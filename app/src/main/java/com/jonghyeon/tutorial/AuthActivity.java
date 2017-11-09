@@ -19,7 +19,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 public class AuthActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
@@ -61,14 +60,17 @@ public class AuthActivity extends AppCompatActivity implements GoogleApiClient.O
         if(requestCode == 100){
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             GoogleSignInAccount account = result.getSignInAccount();
-            firebaseWithGoogle(account);
-
+            if(result.isSuccess()){
+                firebaseWithGoogle(account);
+            }else{
+                Toast.makeText(this, "인증에 실패하셨습니다.", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
+        Toast.makeText(this, "인증에 실패하셨습니다.", Toast.LENGTH_SHORT).show();
     }
 
     private void firebaseWithGoogle(GoogleSignInAccount account){
@@ -78,8 +80,10 @@ public class AuthActivity extends AppCompatActivity implements GoogleApiClient.O
         authResultTask.addOnSuccessListener(new OnSuccessListener<AuthResult>() {
             @Override
             public void onSuccess(AuthResult authResult) {
-                FirebaseUser firebaseUser = authResult.getUser();
-                Toast.makeText(AuthActivity.this, firebaseUser.getEmail(), Toast.LENGTH_LONG).show();
+//                FirebaseUser firebaseUser = authResult.getUser();
+//                Toast.makeText(AuthActivity.this, firebaseUser.getEmail(), Toast.LENGTH_LONG).show();
+                startActivity(new Intent(AuthActivity.this, MainActivity.class));
+                finish();
             }
         });
     }
