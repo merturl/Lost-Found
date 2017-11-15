@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Firebasewithand.iml" filepath="$PROJECT_DIR$/Firebasewithand.iml" />
+      <module fileurl="file://C:\Users\JongHo\Desktop\LANGUAGE_HOME\SOURCE_TREE\test\Firebasewithand.iml" filepath="C:\Users\JongHo\Desktop\LANGUAGE_HOME\SOURCE_TREE\test\Firebasewithand.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://C:\Users\JongHo\Desktop\LANGUAGE_HOME\SOURCE_TREE\test\app\app.iml" filepath="C:\Users\JongHo\Desktop\LANGUAGE_HOME\SOURCE_TREE\test\app\app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/test.iml" filepath="$PROJECT_DIR$/test.iml" />
     </modules>
   </component>
 </project>

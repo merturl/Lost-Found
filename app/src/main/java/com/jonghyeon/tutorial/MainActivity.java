@@ -1,250 +1,163 @@
 package com.jonghyeon.tutorial;
 
-import android.content.Intent;
-import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
+import android.view.ViewGroup;
+
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
+public class MainActivity extends AppCompatActivity {
 
-import java.util.Date;
+    /**
+     * The {@link android.support.v4.view.PagerAdapter} that will provide
+     * fragments for each of the sections. We use a
+     * {@link FragmentPagerAdapter} derivative, which will keep every
+     * loaded fragment in memory. If this becomes too memory intensive, it
+     * may be best to switch to a
+     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
+     */
+    private SectionsPagerAdapter mSectionsPagerAdapter;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
-     private FirebaseAuth mFirebaseAuth;
-     private FirebaseUser mFirebaseUser;
-     private FirebaseDatabase mFirebaseDatabase;
-
-     private EditText etContent;
-     private TextView txtEmail, txtName;
-     private NavigationView mNavigationView;
-
-     private String selectedMemoKey;
-
+    /**
+     * The {@link ViewPager} that will host the section contents.
+     */
+    private ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseUser = mFirebaseAuth.getCurrentUser();
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        etContent = (EditText)findViewById(R.id.content);
-
-        if(mFirebaseUser == null){
-            startActivity(new Intent(MainActivity.this, AuthActivity.class));
-            finish();
-            return;
-        }
-
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fabNewMemo = (FloatingActionButton) findViewById(R.id.new_memo);
-        FloatingActionButton fabSaveMemo = (FloatingActionButton) findViewById(R.id.save_memo);
+        // Create the adapter that will return a fragment for each of the three
+        // primary sections of the activity.
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        fabNewMemo.setOnClickListener(new View.OnClickListener() {
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-                initMemo();
-            }
-        });
-        fabSaveMemo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(selectedMemoKey == null){
-                    saveMemo();
-                }else{
-                    updateMemo();
-                }
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-
-        mNavigationView = (NavigationView)findViewById(R.id.nav_view);
-        View headerVIew = mNavigationView.getHeaderView(0);
-        //헤더의 id이기 때문에 헤더의 R.id를 호출 한다.
-        txtEmail = (TextView)headerVIew.findViewById(R.id.txtEmail);
-        txtName = (TextView)headerVIew.findViewById(R.id.txtName);
-        mNavigationView.setNavigationItemSelectedListener(this);
-
-        profileUpdate();
-        displayMemos();
     }
 
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        Memo selectedMemo = (Memo)item.getActionView().getTag();
-        etContent.setText(selectedMemo.getTxt());
-        selectedMemoKey = selectedMemo.getKey();
-//        if (id == R.id.nav_camera) {
-//            // Handle the camera action
-//        } else if (id == R.id.nav_gallery) {
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.menu_main, menu);
+//        return true;
+//    }
 //
-//        } else if (id == R.id.nav_slideshow) {
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        // Handle action bar item clicks here. The action bar will
+//        // automatically handle clicks on the Home/Up button, so long
+//        // as you specify a parent activity in AndroidManifest.xml.
+//        int id = item.getItemId();
 //
-//        } else if (id == R.id.nav_manage) {
-//
-//        } else if (id == R.id.nav_share) {
-//
-//        } else if (id == R.id.nav_send) {
-//
+//        //noinspection SimplifiableIfStatement
+//        if (id == R.id.action_settings) {
+//            return true;
 //        }
+//
+//        return super.onOptionsItemSelected(item);
+//    }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
+    /**
+     * A placeholder fragment containing a simple view.
+     */
+    public static class PlaceholderFragment extends Fragment {
+        /**
+         * The fragment argument representing the section number for this
+         * fragment.
+         */
+        private static final String ARG_SECTION_NUMBER = "section_number";
 
-    private void initMemo(){
-        etContent.setText("");
-    }
-
-    private void saveMemo(){
-        String text = etContent.getText().toString();
-        if(text.isEmpty()){
-            return;
+        public PlaceholderFragment() {
         }
-        Memo memo = new Memo();
-        memo.setTxt(text);
-        memo.setCreateDate((new Date().getTime()));
-        mFirebaseDatabase.getReference("memos/"+mFirebaseUser.getUid()).push().setValue(memo).addOnSuccessListener(MainActivity.this, new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Snackbar.make(etContent, "메모가 저장되었습니다.", Snackbar.LENGTH_LONG).show();
-                initMemo();
-            }
-        });
-    }
 
-    private void updateMemo(){
-        String text = etContent.getText().toString();
-        if(text.isEmpty()){
-            return;
+        /**
+         * Returns a new instance of this fragment for the given section
+         * number.
+         */
+        public static PlaceholderFragment newInstance(int sectionNumber) {
+            PlaceholderFragment fragment = new PlaceholderFragment();
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            fragment.setArguments(args);
+            return fragment;
         }
-        Memo memo = new Memo();
-        memo.setTxt(text);
-        memo.setCreateDate((new Date().getTime()));
-        mFirebaseDatabase.getReference("memos/"+mFirebaseUser.getUid()+ "/" + selectedMemoKey).setValue(memo).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Snackbar.make(etContent, "메모가 수정되었습니다.", Snackbar.LENGTH_LONG).show();
-                initMemo();
-            }
-        });
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
+            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+            return rootView;
+        }
     }
 
-    private void profileUpdate(){
-        txtEmail.setText(mFirebaseUser.getEmail());
-        txtName.setText(mFirebaseUser.getDisplayName());
-    }
+    /**
+     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
+     * one of the sections/tabs/pages.
+     */
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-    private void displayMemos(){
-        mFirebaseDatabase.getReference("memos/"+mFirebaseUser.getUid()).addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Memo memo = dataSnapshot.getValue(Memo.class);  //generic는 원하는 자료형을 리턴한다.
-                memo.setKey(dataSnapshot.getKey());
-                displayMemoList(memo);
+        public SectionsPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            // getItem is called to instantiate the fragment for the given page.
+            // Return a PlaceholderFragment (defined as a static inner class below).
+            if(position==0) {
+                return new RedFragment();
             }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Memo memo = dataSnapshot.getValue(Memo.class);  //generic는 원하는 자료형을 리턴한다.
-                memo.setKey(dataSnapshot.getKey());
-
-                for(int i = 0; i < mNavigationView.getMenu().size(); i++){
-                    MenuItem menuItem = mNavigationView.getMenu().getItem(i);
-                    if(memo.getKey().equals(((Memo)menuItem.getActionView().getTag()).getKey())){
-                        menuItem.getActionView().setTag(memo);
-                        menuItem.setTitle(memo.getTitle());
-                        break;
-                    }
-                }
+            else if(position==1) {
+                return new GreenFragment();
             }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+            else if(position==2) {
+                return new BlueFragment();
             }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
+            else {
+                return null;
             }
+        }
 
-            @Override  //Load cancel
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-    private void displayMemoList(Memo memo){
-        Menu leftMenu = mNavigationView.getMenu();
-        MenuItem item = leftMenu.add(memo.getTitle());
-        View view = new View(getApplication());
-        view.setTag(memo);
-        item.setActionView(view);
+        @Override
+        public int getCount() {
+            // Show 3 total pages.
+            return 3;
+        }
     }
 }
