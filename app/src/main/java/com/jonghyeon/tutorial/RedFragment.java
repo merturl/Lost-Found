@@ -1,5 +1,6 @@
 package com.jonghyeon.tutorial;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -8,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -17,17 +19,19 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * Created by JongHo on 2017-11-15.
  */
 
-public class RedFragment extends Fragment implements OnMapReadyCallback, LocationListener {
+public class RedFragment extends Fragment implements OnMapReadyCallback, LocationListener{
     private final LatLng MJU_CENTER = new LatLng(37.220940, 127.186750);    // 카메라를 명지대 중심에 놓기 위한 불변의 좌표
     private GoogleMap googleMap = null;
     private MapView mapView = null;
 //    private GPS_Info gps_info;
+    Context context;
 
     //생성자
     public RedFragment() {}
@@ -79,6 +83,16 @@ public class RedFragment extends Fragment implements OnMapReadyCallback, Locatio
         this.googleMap.addMarker(new MarkerOptions().position(SECOND_SHOP).title("3공학관 상점"));
         this.googleMap.addMarker(new MarkerOptions().position(THIRD_SHOP).title("5공학관 상점"));
 
+        this.googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+
+                Toast.makeText(getContext(), marker.getPosition().toString(), Toast.LENGTH_LONG).show();
+                return true;
+            }
+        });
+
+
         this.googleMap.addCircle(new CircleOptions().center(FIRST_SHOP).radius(25.0f).strokeColor(Color.parseColor("#884169e1")).fillColor(Color.parseColor("#5587cefa")));
         this.googleMap.addCircle(new CircleOptions().center(SECOND_SHOP).radius(20.0f).strokeColor(Color.parseColor("#884169e1")).fillColor(Color.parseColor("#5587cefa")));
         this.googleMap.addCircle(new CircleOptions().center(THIRD_SHOP).radius(20.0f).strokeColor(Color.parseColor("#884169e1")).fillColor(Color.parseColor("#5587cefa")));
@@ -91,6 +105,7 @@ public class RedFragment extends Fragment implements OnMapReadyCallback, Locatio
         this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(MJU_CENTER));
         this.googleMap.setLatLngBoundsForCameraTarget(MJU_BOUND);
     }
+
 
     @Override
     public void onStart() {
