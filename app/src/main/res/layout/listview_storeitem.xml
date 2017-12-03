@@ -7,31 +7,36 @@
     android:layout_height="match_parent">
 
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:layout_editor_absoluteX="69dp">
+    <ImageView
+        android:id="@+id/ImageView1"
+        android:layout_width="74dp"
+        android:layout_height="105dp"
+        android:layout_weight="1" />
 
-        <ImageView
-            android:id="@+id/ImageView1"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
+    <LinearLayout
+        android:layout_width="304dp"
+        android:layout_height="106dp"
+        android:layout_marginBottom="404dp"
+        android:layout_marginTop="1dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ImageView1"
+        app:layout_constraintTop_toTopOf="parent">
 
 
         <TextView
-            android:id="@+id/textview1"
+            android:id="@+id/textview_msg"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="226dp"
             android:layout_weight="2"
-            android:text="New Text" />
-        <!--<TextView-->
-        <!--android:id="@+id/textview2"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="New Text"/>-->
+            android:text="msg" />
+
+        <TextView
+            android:id="@+id/textview_getTime"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="getTime" />
 
     </LinearLayout>
 

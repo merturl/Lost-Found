@@ -46,15 +46,16 @@ public class ListViewAdapter extends BaseAdapter {
 
         // 화면에 표시될 View(Layout이 infalte된)로부터 위젯에 대한 참조 획득
         ImageView inconImageView = (ImageView) convertview.findViewById(R.id.ImageView1);
-        TextView titleTextView = (TextView) convertview.findViewById(R.id.textview1);
-//        TextView descTextView = (TextView) convertview.findViewById(R.id.textview2);
+        TextView msg = (TextView) convertview.findViewById(R.id.textview_msg);
+        TextView getTime = (TextView) convertview.findViewById(R.id.textview_getTime);
 
         // Data set(StoreItem)에서 position에 위치한 데이터 참조 획득
         StoreItem storeItem = storeItemList.get(position);
 
         // 아이템 내 각 위젯에 데이터 반영
         inconImageView.setImageDrawable(storeItem.getIcon());
-        titleTextView.setText(storeItem.getStoreItem());
+        msg.setText(storeItem.getmsg());
+        getTime.setText(storeItem.getLostTime());
 
         return convertview;
     }
@@ -72,11 +73,12 @@ public class ListViewAdapter extends BaseAdapter {
     }
 
     // 아이템 데이터 추가를 위한 함수
-    public void addItem(Drawable icon, String title) {
+    public void addItem(Drawable icon, String msg, String time) {
         StoreItem item = new StoreItem();
 
         item.setIcon(icon);
-        item.setStoreItem(title);
+        item.setmsg(msg);
+        item.setLostTime(time);
 
         storeItemList.add(item);
     }

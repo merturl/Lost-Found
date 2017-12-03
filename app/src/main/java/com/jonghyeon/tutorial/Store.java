@@ -23,7 +23,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Store extends AppCompatActivity {
 
@@ -70,10 +72,7 @@ public class Store extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.store_list);
         listView.setAdapter(adapter);
 
-        // 첫 번째 아이템 추가
-        adapter.addItem(ContextCompat.getDrawable(this, R.drawable.ic_item_24dp),
-                "Store"
-        );
+
 //        adapter.addItem(ContextCompat.getDrawable(this, R.drawable.ic_item_24dp),
 //                mFireRef.child("store").push().setValue();
 
@@ -81,8 +80,7 @@ public class Store extends AppCompatActivity {
 //        adapter = new ArrayAdapter<String>(this, R.layout.content_store, storeList );
 //        listView.setAdapter(adapter);
 
-        // 아이템 등록
-        displayStore(storeName, adapter);
+//        display("getItem");
 
     }
 
@@ -91,17 +89,30 @@ public class Store extends AppCompatActivity {
         String s = editText.getText().toString();
         StoreItem item = new StoreItem(s);
         Toast.makeText(this, s, Toast.LENGTH_LONG).show();
-        mFireDB.getReference("store/상점2").setValue(s)
+
+
+//        mFireDB.getReference("store/"+mFirebaseAuth.getCurrentUser().getUid());
+//
+        Map<String, StoreItem> items = new HashMap<String, StoreItem>();
+        items.put("uid", new StoreItem(s));
+
+        mFireDB.getReference("store").setValue(items)
         .addOnSuccessListener(this, new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
+                // 첫 번째 아이템 추가
+                adapter.addItem(
+                        ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_item_24dp),
+                        "Store",
+                        "time"
+                );
                 Toast.makeText(getBaseContext(), "저장성공", Toast.LENGTH_LONG).show();
             }
         });
         editText.setText("");
     }
 
-    private void displayStore(String storeName, final ListViewAdapter adapter){
+    private void display(String storeName){
         Toast.makeText(this, storeName, Toast.LENGTH_SHORT).show();
         mFireDB.getReference("store/"+storeName)
                 .addChildEventListener(new ChildEventListener() {
@@ -109,8 +120,11 @@ public class Store extends AppCompatActivity {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                             StoreItem item = dataSnapshot.getValue(StoreItem.class);
-                            adapter.addItem(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_item_24dp),
-                                "item.");
+                            adapter.addItem(
+                                    ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_item_24dp),
+                                    "item.",
+                                    "time"
+                            );
                     }
 
                     // 아이템 변화가 있을 때 수신
