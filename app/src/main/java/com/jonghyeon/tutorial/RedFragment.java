@@ -1,6 +1,7 @@
 package com.jonghyeon.tutorial;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -9,7 +10,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -83,11 +83,15 @@ public class RedFragment extends Fragment implements OnMapReadyCallback, Locatio
         this.googleMap.addMarker(new MarkerOptions().position(SECOND_SHOP).title("3공학관 상점"));
         this.googleMap.addMarker(new MarkerOptions().position(THIRD_SHOP).title("5공학관 상점"));
 
+
+        // 마커 클릭 이벤트
         this.googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-
-                Toast.makeText(getContext(), marker.getPosition().toString(), Toast.LENGTH_LONG).show();
+//                Toast.makeText(getContext(), marker.getPosition().toString(), Toast.LENGTH_LONG).show();
+                Intent Store = new Intent(getActivity(), Store.class);
+                Store.putExtra("StoreName","함박관 상점");
+                startActivity(Store);
                 return true;
             }
         });
