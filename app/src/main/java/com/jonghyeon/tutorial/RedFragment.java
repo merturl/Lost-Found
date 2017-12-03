@@ -10,7 +10,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -90,9 +89,9 @@ public class RedFragment extends Fragment implements OnMapReadyCallback, Locatio
             @Override
             public boolean onMarkerClick(Marker marker) {
 //                Toast.makeText(getContext(), marker.getPosition().toString(), Toast.LENGTH_LONG).show();
-                Intent inventory = new Intent(getActivity(), Inventory.class);
-                inventory.putExtra("MarkerPosition",marker.getPosition().toString());
-                startActivity(inventory);
+                Intent Store = new Intent(getActivity(), Store.class);
+                Store.putExtra("StoreName","함박관 상점");
+                startActivity(Store);
                 return true;
             }
         });

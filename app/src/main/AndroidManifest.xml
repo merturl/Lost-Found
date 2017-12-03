@@ -33,7 +33,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Inventory"
+            android:name=".Store"
             android:label="@string/title_activity_inventory"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
