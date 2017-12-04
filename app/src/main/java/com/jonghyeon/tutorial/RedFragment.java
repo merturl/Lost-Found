@@ -91,6 +91,7 @@ public class RedFragment extends Fragment implements OnMapReadyCallback, Locatio
 //                Toast.makeText(getContext(), marker.getPosition().toString(), Toast.LENGTH_LONG).show();
                 Intent Store = new Intent(getActivity(), Store.class);
                 Store.putExtra("StoreName","함박관 상점");
+                Store.putExtra("location", marker.getPosition().toString());
                 startActivity(Store);
                 return true;
             }

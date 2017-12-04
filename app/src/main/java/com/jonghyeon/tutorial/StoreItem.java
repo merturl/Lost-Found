@@ -1,6 +1,8 @@
 package com.jonghyeon.tutorial;
 
 import android.graphics.drawable.Drawable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -11,20 +13,21 @@ import java.util.Date;
 
 public class StoreItem extends ListViewAdapter{
 
+
+
     // uid, 사진, 내용
     private Drawable icon;
     private String msg;
-    long now = System.currentTimeMillis();
-    Date date = new Date(now);
-    SimpleDateFormat datetype = new SimpleDateFormat("yyyy-MM-dd");
-    String lostTime = datetype.format(date);
+    private String lostTime = new SimpleDateFormat("yyyy-MM-dd").format(new Date(System.currentTimeMillis()));
+    private String location;
 
 
 
     public StoreItem() {}
 
-    public StoreItem(String msg){
+    public StoreItem(String msg, String location){
         this.msg = msg;
+        this.location = location;
     }
 
 
@@ -36,13 +39,7 @@ public class StoreItem extends ListViewAdapter{
         this.msg = msg;
     }
 
-    public Drawable getIcon() {
-        return icon;
-    }
 
-    public void setIcon(Drawable icon) {
-        this.icon = icon;
-    }
 
     public String getLostTime() {
         return lostTime;
@@ -52,5 +49,19 @@ public class StoreItem extends ListViewAdapter{
         this.lostTime = lostTime;
     }
 
+    public String getLocation() {
+        return location;
+    }
 
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public Drawable getIcon() {
+        return icon;
+    }
+
+    public void setIcon(Drawable icon) {
+        this.icon = icon;
+    }
 }

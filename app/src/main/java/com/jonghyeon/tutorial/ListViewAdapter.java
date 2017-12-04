@@ -2,6 +2,7 @@ package com.jonghyeon.tutorial;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,7 +77,7 @@ public class ListViewAdapter extends BaseAdapter {
     public void addItem(Drawable icon, String msg, String time) {
         StoreItem item = new StoreItem();
 
-        item.setIcon(icon);
+
         item.setmsg(msg);
         item.setLostTime(time);
 

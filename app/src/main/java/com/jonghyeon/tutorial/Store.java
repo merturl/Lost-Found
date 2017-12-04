@@ -1,6 +1,8 @@
 package com.jonghyeon.tutorial;
 
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -60,6 +62,7 @@ public class Store extends AppCompatActivity {
         //  인텐트 값 받아오기
         Intent getintent = getIntent();
         String storeName = getintent.getStringExtra("StoreName");
+        String location = getintent.getStringExtra("location");
 //        Toast.makeText(this, storeName, Toast.LENGTH_SHORT).show();
 //        displayStore(storeName);
 
@@ -85,18 +88,19 @@ public class Store extends AppCompatActivity {
     }
 
     public void addItem(View view){
+        //  인텐트 값 받아오기
+        Intent getintent = getIntent();
+        String location = getintent.getStringExtra("location");
+
         EditText editText = (EditText)findViewById(R.id.tv_send);
         String s = editText.getText().toString();
-        StoreItem item = new StoreItem(s);
-        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
 
 
-//        mFireDB.getReference("store/"+mFirebaseAuth.getCurrentUser().getUid());
-//
+        // 아이템 추가
         Map<String, StoreItem> items = new HashMap<String, StoreItem>();
-        items.put("uid", new StoreItem(s));
-
-        mFireDB.getReference("store").setValue(items)
+        items.put("uid", new StoreItem(s, location ));
+//        Toast.makeText(this, items, Toast.LENGTH_LONG).show();
+        mFireDB.getReference("store").child(mFirebaseAuth.getCurrentUser().getUid()).setValue(items)
         .addOnSuccessListener(this, new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
