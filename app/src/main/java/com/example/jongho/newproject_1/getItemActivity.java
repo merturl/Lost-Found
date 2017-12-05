@@ -1,5 +1,6 @@
 package com.example.jongho.newproject_1;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -12,17 +13,22 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class getItemActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    // Firebase 객체 생성
     private FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase mFireDB = FirebaseDatabase.getInstance();
 
@@ -33,6 +39,8 @@ public class getItemActivity extends AppCompatActivity
         setContentView(R.layout.activity_get_item);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -51,7 +59,43 @@ public class getItemActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
     }
+
+    // DB에 아이템 저장
+    public void saveItem(View v) {
+        Intent getIntent = getIntent();
+
+
+        // 입력한 정보 가져오기
+        EditText edittitle = (EditText)findViewById(R.id.edit_title);
+        EditText editcontent = (EditText)findViewById(R.id.edit_content);
+        EditText edittime = (EditText)findViewById(R.id.edit_time);
+
+        // 저장할 정보
+        double i = 0;
+        double lat = getIntent.getDoubleExtra("lat", i);
+        double lng = getIntent.getDoubleExtra("lng", i);
+        Toast.makeText(this, String.valueOf(lat) , Toast.LENGTH_SHORT).show();
+        String title = edittitle.getText().toString();
+        String content = editcontent.getText().toString();
+        String time = edittime.getText().toString();
+
+        // lat, lng,  title, content, time
+        Map<String, getItem> saveitem = new HashMap<String, getItem>();
+//        Toast.makeText(this, point,Toast.LENGTH_SHORT).show();
+        saveitem.put(mFirebaseAuth.getCurrentUser().getUid(), new getItem(lat, lng, title, content));
+        mFireDB.getReference("getItem").setValue(saveitem);
+
+        edittitle.setText("");
+        editcontent.setText("");
+        edittime.setText("");
+
+        Intent intent = new Intent(this, MapsActivity.class);
+        startActivity(intent);
+    }
+
 
     @Override
     public void onBackPressed() {

@@ -27,12 +27,21 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.LocationListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MapsActivity extends FragmentActivity implements LocationListener, OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener {
     private GoogleApiClient mGoogleApiClient;
-    private GoogleMap googleMap;
+    private  GoogleMap googleMap;
     private Location mLocation = null;
     private LatLng MJU;
+
+    // Firebase 객체 생성
+    private FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
+    private FirebaseDatabase mFireDB = FirebaseDatabase.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +80,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
 
-//        // 클릭 이벤트 삽입
-//        this.googleMap.setOnMapClickListener(this);
         // 클릭 이벤트 삽입
         this.googleMap.setOnMapClickListener(this);
 
@@ -95,6 +102,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         // Click이벤트
         this.googleMap.setOnMapClickListener(this);
         this.googleMap.setOnMapLongClickListener(this);
+
+        display();
 
     }
 
@@ -129,6 +138,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         MJU = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
         this.googleMap.addMarker(new MarkerOptions().position(MJU).title("Current My Position"));
         this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(MJU));
+
     }
     // 클릭 이벤트
     @Override
@@ -136,12 +146,56 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         Point clickPoint = this.googleMap.getProjection().toScreenLocation(latLng);
         LatLng point = this.googleMap.getProjection().fromScreenLocation(clickPoint);
 
-        Toast.makeText(this, "Click Point Lat : " + point.latitude + " Lon : " + point.longitude, Toast.LENGTH_LONG).show();
-        startActivity(new Intent(this, getItemActivity.class));
+//        Toast.makeText(this, "Click Point Lat : " + point.latitude + " Lon : " + point.longitude, Toast.LENGTH_LONG).show();
+
+        // getItemActivity 전환 인텐트
+        Intent intent = new Intent(this, getItemActivity.class);
+        intent.putExtra("lat", point.latitude);
+        intent.putExtra("lng", point.longitude);
+        startActivity(intent);
     }
 
     @Override
     public void onMapLongClick(LatLng latLng) {
         Toast.makeText(this, "LongClick", Toast.LENGTH_LONG).show();
+    }
+
+    private void display() {
+//        Toast.makeText(this, storeName, Toast.LENGTH_SHORT).show();
+        mFireDB.getReference("getItem")
+                .addChildEventListener(new ChildEventListener() {
+
+                    // 리스트의 아이템을 검색하거나 아이템 추가가 있을 때 수신
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        getItem getitem = dataSnapshot.getValue(com.example.jongho.newproject_1.getItem.class);
+
+                        MapsActivity.this.googleMap.addMarker(new MarkerOptions().position(new LatLng(getitem.getLat(), getitem.getLng())).title("Current My Position").title(getitem.getTitle()));
+
+                    }
+
+                    // 아이템 변화가 있을 때 수신
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    // 아이템이 삭제 되었을 때 수신
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    // 순서가 있는 리스트에서 순서가 변경 되었을 때 수신
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 }

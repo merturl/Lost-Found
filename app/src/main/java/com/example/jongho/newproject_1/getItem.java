@@ -1,5 +1,7 @@
 package com.example.jongho.newproject_1;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -9,6 +11,9 @@ import java.util.Date;
 
 public class getItem {
 
+
+    private double lat;
+    private double lng;
     private String title;
     private String content;
     private String gettime;
@@ -18,17 +23,25 @@ public class getItem {
     // 생성자
     public getItem() { }
 
-    public getItem(String title, String content) {
+    // lat, lng, title, content, time
+    public getItem(double lat, double lng, String title, String content,  String gettime) {
+        this.lat = lat;
+        this.lng = lng;
         this.title = title;
         this.content = content;
-        // 시간 입력안했을 때 default로 현재 시각
+        this.gettime = gettime;
+    }
+
+    // 시간을 입력안했을 때 default로 현재 시각
+    public getItem(double lat, double lng, String title, String content) {
+        this.lat = lat;
+        this.lng = lng;
+        this.title = title;
+        this.content = content;
         this.gettime = new SimpleDateFormat("yyyy-MM-dd").format(new Date(System.currentTimeMillis()));
     }
 
-    public getItem(String title, String content, String gettime) {
-        this.title = title;
-        this.content = content;
-    }
+
 
     public String getTitle() {
         return title;
@@ -62,5 +75,19 @@ public class getItem {
         this.location = location;
     }
 
+    public double getLat() {
+        return lat;
+    }
 
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public double getLng() {
+        return lng;
+    }
+
+    public void setLng(double lng) {
+        this.lng = lng;
+    }
 }
