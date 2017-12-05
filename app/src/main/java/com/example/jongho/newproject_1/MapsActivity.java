@@ -22,6 +22,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -160,8 +161,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         Toast.makeText(this, "LongClick", Toast.LENGTH_LONG).show();
     }
 
+    // Firebase 변화 수신
     private void display() {
-//        Toast.makeText(this, storeName, Toast.LENGTH_SHORT).show();
         mFireDB.getReference("getItem/"+mFirebaseAuth.getCurrentUser().getUid())
                 .addChildEventListener(new ChildEventListener() {
 
@@ -171,7 +172,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
                         getItem getitem = dataSnapshot.getValue(com.example.jongho.newproject_1.getItem.class);
 
                         // 구글맵에 마커 추가
-                        MapsActivity.this.googleMap.addMarker(new MarkerOptions().position(new LatLng(getitem.getLat(), getitem.getLng())).title(getitem.getTitle()));
+                        MapsActivity.this.googleMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(getitem.getLat(), getitem.getLng()))
+                                .title(getitem.getTitle())
+                                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_announcement)));
+
                         Toast.makeText(MapsActivity.this, getitem.getTitle(), Toast.LENGTH_SHORT).show();
                     }
 
