@@ -75,6 +75,17 @@
       },
       "oauth_client": [
         {
+<<<<<<< HEAD
+=======
+          "client_id": "79140477982-eqci0hiaov34tnpu112ar28l3t8ut1bd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.jongho.newproject_1",
+            "certificate_hash": "d0e4d8e9785fe22372c9c9b7968c2f11aa5185a1"
+          }
+        },
+        {
+>>>>>>> feature/getItem
           "client_id": "79140477982-1agdagb2bfqe4vssohr3r6035df35nqa.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
