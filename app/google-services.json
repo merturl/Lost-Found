@@ -75,8 +75,14 @@
       },
       "oauth_client": [
         {
-<<<<<<< HEAD
-=======
+          "client_id": "79140477982-4rqh52qkocu6gqb5leu1s93kc92du5ik.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.jongho.newproject_1",
+            "certificate_hash": "2fdf770de1c913eabe4cc82d7c9ecd2de78114e9"
+          }
+        },
+        {
           "client_id": "79140477982-eqci0hiaov34tnpu112ar28l3t8ut1bd.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -85,7 +91,6 @@
           }
         },
         {
->>>>>>> feature/getItem
           "client_id": "79140477982-1agdagb2bfqe4vssohr3r6035df35nqa.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
