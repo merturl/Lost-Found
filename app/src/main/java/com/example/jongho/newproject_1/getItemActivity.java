@@ -74,20 +74,26 @@ public class getItemActivity extends AppCompatActivity
         EditText edittime = (EditText)findViewById(R.id.edit_time);
 
         // 저장할 정보
-        String point = getIntent.getStringExtra("point");
+        double i = 0;
+        double lat = getIntent.getDoubleExtra("lat", i);
+        double lng = getIntent.getDoubleExtra("lng", i);
+        Toast.makeText(this, String.valueOf(lat) , Toast.LENGTH_SHORT).show();
         String title = edittitle.getText().toString();
         String content = editcontent.getText().toString();
         String time = edittime.getText().toString();
 
-        // point, title, content, time
+        // lat, lng,  title, content, time
         Map<String, getItem> saveitem = new HashMap<String, getItem>();
-        Toast.makeText(this, point,Toast.LENGTH_SHORT).show();
-        saveitem.put(mFirebaseAuth.getCurrentUser().getUid(), new getItem(point, title, content));
+//        Toast.makeText(this, point,Toast.LENGTH_SHORT).show();
+        saveitem.put(mFirebaseAuth.getCurrentUser().getUid(), new getItem(lat, lng, title, content));
         mFireDB.getReference("getItem").setValue(saveitem);
 
         edittitle.setText("");
         editcontent.setText("");
         edittime.setText("");
+
+        Intent intent = new Intent(this, MapsActivity.class);
+        startActivity(intent);
     }
 
 

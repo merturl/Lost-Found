@@ -12,7 +12,8 @@ import java.util.Date;
 public class getItem {
 
 
-    private String point;
+    private double lat;
+    private double lng;
     private String title;
     private String content;
     private String gettime;
@@ -23,20 +24,21 @@ public class getItem {
     public getItem() { }
 
     // lat, lng, title, content, time
-    public getItem(String point, String title, String content,  String gettime) {
-        this.point = point;
+    public getItem(double lat, double lng, String title, String content,  String gettime) {
+        this.lat = lat;
+        this.lng = lng;
         this.title = title;
         this.content = content;
         this.gettime = gettime;
     }
 
     // 시간을 입력안했을 때 default로 현재 시각
-    public getItem(String point, String title, String content) {
-        this.point = point;
+    public getItem(double lat, double lng, String title, String content) {
+        this.lat = lat;
+        this.lng = lng;
         this.title = title;
         this.content = content;
         this.gettime = new SimpleDateFormat("yyyy-MM-dd").format(new Date(System.currentTimeMillis()));
-
     }
 
 
@@ -73,13 +75,19 @@ public class getItem {
         this.location = location;
     }
 
-    public String getPoint() {
-        return point;
+    public double getLat() {
+        return lat;
     }
 
-    public void setPoint(String point) {
-        this.point = point;
+    public void setLat(double lat) {
+        this.lat = lat;
     }
 
+    public double getLng() {
+        return lng;
+    }
 
+    public void setLng(double lng) {
+        this.lng = lng;
+    }
 }
