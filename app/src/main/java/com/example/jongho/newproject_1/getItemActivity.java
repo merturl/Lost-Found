@@ -73,15 +73,13 @@ public class getItemActivity extends AppCompatActivity
         EditText editcontent = (EditText)findViewById(R.id.edit_content);
         EditText edittime = (EditText)findViewById(R.id.edit_time);
 
-//        Toast.makeText(this, getIntent.getStringExtra("point"),Toast.LENGTH_SHORT).show();
-
         // 저장할 정보
         String point = getIntent.getStringExtra("point");
         String title = edittitle.getText().toString();
         String content = editcontent.getText().toString();
         String time = edittime.getText().toString();
 
-        // lat, lng, title, content, time
+        // point, title, content, time
         Map<String, getItem> saveitem = new HashMap<String, getItem>();
         Toast.makeText(this, point,Toast.LENGTH_SHORT).show();
         saveitem.put(mFirebaseAuth.getCurrentUser().getUid(), new getItem(point, title, content));
