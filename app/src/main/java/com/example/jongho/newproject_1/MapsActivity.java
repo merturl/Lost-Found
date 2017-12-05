@@ -22,6 +22,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -160,9 +161,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         Toast.makeText(this, "LongClick", Toast.LENGTH_LONG).show();
     }
 
+    // Firebase 변화 수신
     private void display() {
-//        Toast.makeText(this, storeName, Toast.LENGTH_SHORT).show();
-        mFireDB.getReference("getItem")
+        mFireDB.getReference("getItem/"+mFirebaseAuth.getCurrentUser().getUid())
                 .addChildEventListener(new ChildEventListener() {
 
                     // 리스트의 아이템을 검색하거나 아이템 추가가 있을 때 수신
@@ -170,8 +171,13 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         getItem getitem = dataSnapshot.getValue(com.example.jongho.newproject_1.getItem.class);
 
-                        MapsActivity.this.googleMap.addMarker(new MarkerOptions().position(new LatLng(getitem.getLat(), getitem.getLng())).title("Current My Position").title(getitem.getTitle()));
+                        // 구글맵에 마커 추가
+                        MapsActivity.this.googleMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(getitem.getLat(), getitem.getLng()))
+                                .title(getitem.getTitle())
+                                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_announcement)));
 
+                        Toast.makeText(MapsActivity.this, getitem.getTitle(), Toast.LENGTH_SHORT).show();
                     }
 
                     // 아이템 변화가 있을 때 수신
