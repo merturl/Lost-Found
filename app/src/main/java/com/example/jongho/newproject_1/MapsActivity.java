@@ -71,8 +71,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
 
-//        // 클릭 이벤트 삽입
-//        this.googleMap.setOnMapClickListener(this);
         // 클릭 이벤트 삽입
         this.googleMap.setOnMapClickListener(this);
 
@@ -136,8 +134,12 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         Point clickPoint = this.googleMap.getProjection().toScreenLocation(latLng);
         LatLng point = this.googleMap.getProjection().fromScreenLocation(clickPoint);
 
-        Toast.makeText(this, "Click Point Lat : " + point.latitude + " Lon : " + point.longitude, Toast.LENGTH_LONG).show();
-        startActivity(new Intent(this, getItemActivity.class));
+//        Toast.makeText(this, "Click Point Lat : " + point.latitude + " Lon : " + point.longitude, Toast.LENGTH_LONG).show();
+
+        // getItemActivity 전환 인텐트
+        Intent intent = new Intent(this, getItemActivity.class);
+        intent.putExtra("point", point.toString());
+        startActivity(intent);
     }
 
     @Override
