@@ -1,6 +1,7 @@
 package com.example.jongho.newproject_1;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.location.Location;
@@ -23,7 +24,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.LocationListener;
 
@@ -70,8 +70,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
 
-        // 클릭 이벤트 삽입
-        this.googleMap.setOnMapClickListener(this);
+//        // 클릭 이벤트 삽입
+//        this.googleMap.setOnMapClickListener(this);
 
         // 지도에 명지대의 범위만 보여주기 위해 결정한 범위
         LatLngBounds MJU_BOUND = new LatLngBounds(new LatLng(37.2172, 127.180), new LatLng(37.2245, 127.1919));
@@ -128,12 +128,14 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(MJU));
     }
 
+    // 클릭 이벤트
     @Override
     public void onMapClick(LatLng latLng) {
         Point clickPoint = this.googleMap.getProjection().toScreenLocation(latLng);
         LatLng point = this.googleMap.getProjection().fromScreenLocation(clickPoint);
 
         Toast.makeText(this, "Click Point Lat : " + point.latitude + " Lon : " + point.longitude, Toast.LENGTH_LONG).show();
+        startActivity(new Intent(this, getItemActivity.class));
     }
 
     @Override

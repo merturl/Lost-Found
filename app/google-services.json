@@ -1,0 +1,115 @@
+{
+  "project_info": {
+    "project_number": "79140477982",
+    "firebase_url": "https://memowebapp-a4b04.firebaseio.com",
+    "project_id": "memowebapp-a4b04",
+    "storage_bucket": "memowebapp-a4b04.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:79140477982:android:e87c08dfc84ca72b",
+        "android_client_info": {
+          "package_name": "com.jonghyeon.tutorial"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "79140477982-1vgl50te0k0mud7kaversct9ukvcb14h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jonghyeon.tutorial",
+            "certificate_hash": "d0e4d8e9785fe22372c9c9b7968c2f11aa5185a1"
+          }
+        },
+        {
+          "client_id": "79140477982-ub8ai1letjkrshhp5isin2hktgnsfnq3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jonghyeon.tutorial",
+            "certificate_hash": "34effcc3e2efbb5ce1402eeccd3cd9cf62b0c880"
+          }
+        },
+        {
+          "client_id": "79140477982-8fv3icvva8l2il7tcr9nvrkkiptoui5e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jonghyeon.tutorial",
+            "certificate_hash": "901d9b9129518f88ee05fd44aee2dc182caa9e5d"
+          }
+        },
+        {
+          "client_id": "79140477982-1dgf0djmq2195osl0e5t5mna854dpv08.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1IlsVBKduHkIjU-38Z4xgaXck0vcGe3Y"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "79140477982-1dgf0djmq2195osl0e5t5mna854dpv08.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:79140477982:android:df2f1f10c3273798",
+        "android_client_info": {
+          "package_name": "com.example.jongho.newproject_1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "79140477982-1agdagb2bfqe4vssohr3r6035df35nqa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.jongho.newproject_1",
+            "certificate_hash": "34effcc3e2efbb5ce1402eeccd3cd9cf62b0c880"
+          }
+        },
+        {
+          "client_id": "79140477982-1dgf0djmq2195osl0e5t5mna854dpv08.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1IlsVBKduHkIjU-38Z4xgaXck0vcGe3Y"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "79140477982-1dgf0djmq2195osl0e5t5mna854dpv08.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

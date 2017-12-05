@@ -48,8 +48,9 @@ public class AuthActivity extends AppCompatActivity implements GoogleApiClient.O
         mSigninBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-                startActivityForResult(intent, 100);
+//                Intent intent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+//                startActivityForResult(intent, 100);
+                startActivity(new Intent(AuthActivity.this, MapsActivity.class));
             }
         });
     }
