@@ -12,15 +12,17 @@
             android:id="@+id/btn1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="pressEnd"
             android:layout_weight="1"
-            android:text="REGISTER" />
+            android:text="Geofence_End" />
 
         <Button
             android:id="@+id/btn2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="REQUEST" />
+            android:onClick="pressGeofence"
+            android:text="Geofence_Start" />
 
         <Button
             android:id="@+id/test"
@@ -28,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="pressGps"
-            android:text="test" />
+            android:text="Gps_Start" />
     </LinearLayout>
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
