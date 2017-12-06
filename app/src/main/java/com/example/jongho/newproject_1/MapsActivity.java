@@ -1,11 +1,13 @@
 package com.example.jongho.newproject_1;
 
 import android.Manifest;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.location.Location;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -16,6 +18,9 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,17 +33,23 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.maps.model.internal.zzp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.android.gms.common.api.ResultCallback;
 
-public class MapsActivity extends FragmentActivity implements LocationListener, OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener {
+import java.util.ArrayList;
+import java.util.Map;
+
+public class MapsActivity extends FragmentActivity implements LocationListener, OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener, ResultCallback<Status> {
     private GoogleApiClient mGoogleApiClient;
+    protected ArrayList<Geofence> mGeofenceList;
     private  GoogleMap googleMap;
     private Location mLocation = null;
-    private LatLng MJU;
+    private final int scope = 10000;
 
     // Firebase 객체 생성
     private FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
@@ -87,6 +98,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         // 지도에 명지대의 범위만 보여주기 위해 결정한 범위
         LatLngBounds MJU_BOUND = new LatLngBounds(new LatLng(37.2172, 127.180), new LatLng(37.2245, 127.1919));
 
+
+
         // 나침반이 보이게 설정
         this.googleMap.getUiSettings().setCompassEnabled(true);
         this.googleMap.getUiSettings().setZoomControlsEnabled(true);
@@ -106,6 +119,49 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
 
         display();
 
+    }
+
+    public void pressGeofence(View view) {
+        String[] permissions = new String[] {Manifest.permission.INTERNET, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            for(String permission:permissions) {
+                int result = PermissionChecker.checkSelfPermission(this, permission);
+                if(result == PermissionChecker.PERMISSION_GRANTED) ;
+                else {
+                    ActivityCompat.requestPermissions(this, permissions, 1);
+                }
+            }
+        }
+        if(Build.VERSION.SDK_INT >= 24 &&
+                ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+            return;
+
+        LocationRequest locreq = new LocationRequest();
+        locreq.setInterval(5000);
+        locreq.setFastestInterval(4000);
+        locreq.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, locreq, this);
+
+        mGeofenceList = new ArrayList<Geofence>();
+        for(Map.Entry<String, LatLng> entry : Constants.zones.entrySet()) {
+            mGeofenceList.add(new Geofence.Builder().setRequestId(entry.getKey()).setCircularRegion(entry.getValue().latitude, entry.getValue().longitude, 5000).setExpirationDuration(360000).setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT).build());
+
+            Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
+            PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+            builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
+            builder.addGeofences(mGeofenceList);
+            GeofencingRequest georeq = builder.build();
+
+            try {
+                LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, georeq, pendingIntent).setResultCallback(this);
+            } catch (SecurityException s) {
+
+            }
+        }
     }
 
     public void pressGps(View view) {
@@ -132,13 +188,26 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, request, this);
     }
 
+    public void pressEnd(View view) {
+        try {
+            Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
+            PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            LocationServices.GeofencingApi.removeGeofences(mGoogleApiClient, pendingIntent).setResultCallback(this);
+        }
+        catch (SecurityException s) {
+
+        }
+    }
+
     @Override
     public void onLocationChanged(Location location) {
         this.mLocation = location;
         Log.e("SEX",  "Lat : " + mLocation.getLatitude() + ", Lon : " + mLocation.getLongitude());
-        MJU = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
-        this.googleMap.addMarker(new MarkerOptions().position(MJU).title("Current My Position"));
-        this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(MJU));
+        this.googleMap.clear();
+        MarkerOptions currentMarker = new MarkerOptions();
+        currentMarker.position(new LatLng(mLocation.getLatitude(), mLocation.getLongitude())).title("Current Position!");
+        this.googleMap.addMarker(currentMarker);
+        this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(currentMarker.getPosition()));
 
     }
     // 클릭 이벤트
@@ -203,5 +272,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
 
                     }
                 });
+    }
+
+    @Override
+    public void onResult(@NonNull Status status) {
+
     }
 }
