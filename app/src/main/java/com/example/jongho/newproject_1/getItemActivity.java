@@ -91,6 +91,7 @@ public class getItemActivity extends AppCompatActivity
 
         Intent intent = new Intent(this, MapsActivity.class);
         startActivity(intent);
+        overridePendingTransition(R.anim.anim_slide_in_left,R.anim.anim_slide_out_right);
     }
 
 

@@ -141,7 +141,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(MJU));
 
     }
-    // 클릭 이벤트
+    // 맵 클릭 이벤트
     @Override
     public void onMapClick(LatLng latLng) {
         Point clickPoint = this.googleMap.getProjection().toScreenLocation(latLng);
@@ -154,6 +154,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         intent.putExtra("lat", point.latitude);
         intent.putExtra("lng", point.longitude);
         startActivity(intent);
+        overridePendingTransition(R.anim.anim_slide_in_right,R.anim.anim_slide_out_left);
     }
 
     @Override
@@ -177,7 +178,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
                                 .title(getitem.getTitle())
                                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_announcement)));
 
-                        Toast.makeText(MapsActivity.this, getitem.getTitle(), Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(MapsActivity.this, getitem.getTitle(), Toast.LENGTH_SHORT).show();
                     }
 
                     // 아이템 변화가 있을 때 수신
