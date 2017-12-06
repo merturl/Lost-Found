@@ -2,8 +2,6 @@ package com.example.jongho.newproject_1;
 
 import android.util.Log;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 
@@ -18,8 +16,8 @@ public class MyFirebaseInstanceIdService extends FirebaseInstanceIdService {
 
         Log.d("haha", "hllleoo");
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Notifications");
-        reference.child("token").setValue(refreshedToken);
+//        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Notifications");
+//        reference.child("token").setValue(refreshedToken);
         Log.d("myFirebaseid", "Refreshed token" + refreshedToken);
     }
 }
