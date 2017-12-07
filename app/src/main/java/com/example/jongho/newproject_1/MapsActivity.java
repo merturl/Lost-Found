@@ -78,6 +78,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         }
         super.onStart();
     }
+    
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -204,16 +205,25 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
 
 
     public void pressGps(View view) {
+        Log.d("Loation", "pressgps1");
         String[] permissions = new String[] {Manifest.permission.INTERNET, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             for(String permission:permissions) {
                 int result = PermissionChecker.checkSelfPermission(this, permission);
-                if(result == PermissionChecker.PERMISSION_GRANTED) ;
+                if(result == PermissionChecker.PERMISSION_GRANTED) {
+                    Log.d("Loation", "pressgps3");
+                    LocationRequest request = new LocationRequest();
+                    request.setInterval(3000);
+                    request.setFastestInterval(3000);
+                    request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                    LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, request, this);
+                }
                 else {
                     ActivityCompat.requestPermissions(this, permissions, 1);
                 }
             }
         }else {
+            Log.d("Loation", "pressgps2");
             LocationRequest request = new LocationRequest();
             request.setInterval(3000);
             request.setFastestInterval(3000);
