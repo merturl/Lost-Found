@@ -18,27 +18,37 @@ public class getItem {
     private String content;
     private String gettime;
     private String location;
-    // 사진 추가
+    private String uri;
 
     // 생성자
     public getItem() { }
 
-    // lat, lng, title, content, time
-    public getItem(double lat, double lng, String title, String content,  String gettime) {
-        this.lat = lat;
-        this.lng = lng;
-        this.title = title;
-        this.content = content;
-        this.gettime = gettime;
-    }
+//    // lat, lng, title, content, time
+//    public getItem(double lat, double lng, String title, String content,  String gettime) {
+//        this.lat = lat;
+//        this.lng = lng;
+//        this.title = title;
+//        this.content = content;
+//        this.gettime = gettime;
+//    }
+
+//    // 시간을 입력안했을 때 default로 현재 시각
+//    public getItem(double lat, double lng, String title, String content) {
+//        this.lat = lat;
+//        this.lng = lng;
+//        this.title = title;
+//        this.content = content;
+//        this.gettime = new SimpleDateFormat("yyyy-MM-dd").format(new Date(System.currentTimeMillis()));
+//    }
 
     // 시간을 입력안했을 때 default로 현재 시각
-    public getItem(double lat, double lng, String title, String content) {
+    public getItem(double lat, double lng, String title, String content, String uri) {
         this.lat = lat;
         this.lng = lng;
         this.title = title;
         this.content = content;
         this.gettime = new SimpleDateFormat("yyyy-MM-dd").format(new Date(System.currentTimeMillis()));
+        this.uri = uri;
     }
 
 
@@ -89,5 +99,13 @@ public class getItem {
 
     public void setLng(double lng) {
         this.lng = lng;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 }
