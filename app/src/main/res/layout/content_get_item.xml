@@ -8,6 +8,7 @@
     tools:context="com.example.jongho.newproject_1.getItemActivity"
     tools:showIn="@layout/app_bar_get_item">
 
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

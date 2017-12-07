@@ -82,9 +82,10 @@ public class getItemActivity extends AppCompatActivity
         editcontent.setText("");
         edittime.setText("");
 
-//        Intent intent = new Intent(this, MapsActivity.class);
-//        startActivity(intent);
         finish();
+
+        // 화면전환 애니메이션 효과
+        overridePendingTransition(R.anim.anim_slide_in_left,R.anim.anim_slide_out_right);
     }
 
 
