@@ -25,7 +25,6 @@ public class TypeActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
 
-        finish();
     }
 
     public void moveGetItem(View view) {

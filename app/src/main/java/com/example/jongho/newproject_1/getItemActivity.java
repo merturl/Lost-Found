@@ -97,6 +97,7 @@ public class getItemActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.i("onDestroy","onDestroy");
     }
 
     // DB에 아이템 저장
