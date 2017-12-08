@@ -9,7 +9,7 @@
     tools:showIn="@layout/activity_item_view">
 
     <ImageView
-        android:id="@+id/iv_item"
+        android:id="@+id/imgv_item"
         android:layout_width="388dp"
         android:layout_height="191dp"
         android:layout_marginBottom="320dp"
@@ -38,13 +38,13 @@
             android:text="TextView" />
 
         <TextView
-            android:id="@+id/text_ItemContent"
+            android:id="@+id/text_ItemTime"
             android:layout_width="match_parent"
             android:layout_height="33dp"
             android:text="TextView" />
 
         <TextView
-            android:id="@+id/text_ItemTime"
+            android:id="@+id/text_ItemContent"
             android:layout_width="match_parent"
             android:layout_height="180dp"
             android:text="TextView" />

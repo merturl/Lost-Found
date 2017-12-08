@@ -77,7 +77,6 @@ public class LostItemActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
 
-        finish();
     }
 
     // DB에 아이템 저장
@@ -130,7 +129,7 @@ public class LostItemActivity extends AppCompatActivity {
         Toast.makeText(this, "start uploadImages == " + lostitemkey, Toast.LENGTH_SHORT).show();
         //파이어스토어 접근 레퍼런스    // Item/image/uid/randomkey.jpg
         Toast.makeText(this, "start uploadImages == " + mFirebaseAuth.getCurrentUser().getUid(), Toast.LENGTH_SHORT).show();
-        StorageReference reference = mStorageRef.child("lostItem/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+lostitemkey +".jpg");
+        StorageReference reference = mStorageRef.child("Item/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+lostitemkey +".jpg");
 
 
         //파이어베이스스에 쓰이는 데이터로 이미지 변환

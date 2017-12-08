@@ -61,6 +61,7 @@ public class getItemActivity extends AppCompatActivity
         checkPerssions();
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
+
         //imgview에 리스너를 달아 이미지뷰 클릭시 이미지 추가를 함
         imageViewgetItem = (ImageView) findViewById(R.id.getImage);
         imageViewgetItem.setOnClickListener(new View.OnClickListener() {
@@ -94,10 +95,8 @@ public class getItemActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-
-        finish();
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     // DB에 아이템 저장
@@ -121,7 +120,7 @@ public class getItemActivity extends AppCompatActivity
 
         // 아이템 저장 lat, lng,  title, content, time
         Item saveitem = new Item(lat, lng, title, content);
-        DatabaseReference mFireRef = mFireDB.getReference("Item/"+mFirebaseAuth.getCurrentUser().getUid()).push();
+        DatabaseReference mFireRef = mFireDB.getReference("getItem/"+mFirebaseAuth.getCurrentUser().getUid()).push();
         mFireRef.setValue(saveitem);
         String postId = mFireRef.getKey();
 

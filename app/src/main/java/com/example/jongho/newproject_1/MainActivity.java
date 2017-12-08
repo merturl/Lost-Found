@@ -48,6 +48,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.HashMap;
+
 //MainAcritivity
 public class MainActivity extends AppCompatActivity implements LocationListener, OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener {
 
@@ -359,16 +361,27 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 //        this.googleMap.setLatLngBoundsForCameraTarget(MJU_BOUND);
 
         // 마커 클릭 이벤트
-        this.googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-//                Toast.makeText(getContext(), marker.getPosition().toString(), Toast.LENGTH_LONG).show();
-                Intent ItemView = new Intent(MainActivity.this, ItemViewActivity.class);
-                ItemView.putExtra("ItemRef", marker.getTag().toString());
-                startActivity(ItemView);
-                return true;
-            }
-        });
+        try{
+            this.googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    HashMap<String, Object> tag;
+                    tag = (HashMap) marker.getTag();
+//                Toast.makeText(MainActivity.this, tag.get("ImageRef").toString() , Toast.LENGTH_LONG).show();
+                    Intent ItemView = new Intent(MainActivity.this, ItemViewActivity.class);
+                    ItemView.putExtra("DbRef", tag.get("DbRef").toString());
+                    ItemView.putExtra("ImageRef", tag.get("ImageRef").toString());
+                    startActivity(ItemView);
+                    return true;
+                }
+            });
+        } catch ( NullPointerException e ) {
+            // 본인 마커 찍었을 때 예외처리
+            Toast.makeText(this, "Sorry, Click other point", Toast.LENGTH_SHORT).show();
+        }
+
+
+        this.googleMap.setOnMapClickListener(this);
         this.googleMap.setOnMapLongClickListener(this);
 
         display();
@@ -406,7 +419,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     // Firebase 변화 수신
     private void display() {
         // Item 수신
-        mFireDB.getReference("Item/"+mFirebaseAuth.getCurrentUser().getUid())
+        mFireDB.getReference("getItem/"+mFirebaseAuth.getCurrentUser().getUid())
                 .addChildEventListener(new ChildEventListener() {
 
                     // 리스트의 아이템을 검색하거나 아이템 추가가 있을 때 수신
@@ -421,7 +434,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                                 .title(getitem.getTitle())
                                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_getitem)));
 
-                        addMarker.setTag("Item/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
+                        HashMap<String, Object> tag = new HashMap<String, Object>();
+                        tag.put("DbRef", "getItem/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
+                        tag.put("ImageRef", "Item/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
+
+                        addMarker.setTag(tag);
+
                     }
 
                     // 아이템 변화가 있을 때 수신
@@ -458,11 +476,19 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                         Item getitem = dataSnapshot.getValue(Item.class);
 
                         // 구글맵에 마커 추가
-                        MainActivity.this.googleMap.addMarker(new MarkerOptions()
+                        addMarker= MainActivity.this.googleMap.addMarker(new MarkerOptions()
                                 .position(new LatLng(getitem.getLat(), getitem.getLng()))
                                 .title(getitem.getTitle())
                                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_lostitem)));
+
+                        HashMap<String, Object> tag = new HashMap<String, Object>();
+                        tag.put("DbRef", "lostItem/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
+                        tag.put("ImageRef", "Item/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
+
+                        addMarker.setTag(tag);
                     }
+
+
 
                     // 아이템 변화가 있을 때 수신
                     @Override
