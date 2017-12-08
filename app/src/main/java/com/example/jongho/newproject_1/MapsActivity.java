@@ -85,7 +85,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         this.googleMap = googleMap;
 
         // 지도에 명지대의 범위만 보여주기 위해 결정한 범위
-        LatLngBounds MJU_BOUND = new LatLngBounds(new LatLng(37.2172, 127.180), new LatLng(37.2245, 127.1919));
+        LatLngBounds MJU_BOUND = new LatLngBounds(new LatLng(37.2172,  127.180), new LatLng(37.2245, 127.1919));
 
         // 나침반이 보이게 설정
         this.googleMap.getUiSettings().setCompassEnabled(true);
