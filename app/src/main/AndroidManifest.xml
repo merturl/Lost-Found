@@ -10,8 +10,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -34,13 +34,14 @@
              sign the APK for publishing.
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        <!-- <activity android:name=".MainActivity"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.MAIN" /> -->
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+
+        <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+        <!-- </intent-filter> -->
+        <!-- </activity> -->
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -57,6 +58,13 @@
             </intent-filter>
         </service>
 
+        <activity android:name=".AuthActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps">
@@ -75,7 +83,12 @@
             android:name=".GeofenceTransitionsIntentService"
             android:exported="false" />
 
-        <!--<activity android:name=".MainActivity"></activity>-->
+        <activity android:name=".MainActivity" />
+        <activity android:name=".TypeActivity" />
+        <activity
+            android:name=".LostItemActivity"
+            android:label="@string/title_activity_lost_item"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
