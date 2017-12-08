@@ -18,7 +18,7 @@ public class getItem {
     private String content;
     private String gettime;
     private String location;
-    // 사진 추가
+    private String uri;
 
     // 생성자
     public getItem() { }

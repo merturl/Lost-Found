@@ -10,67 +10,79 @@
 
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/ivUser"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="10dp"
+            android:background="#eeeeee"
+            android:contentDescription="이미지를 넣어주세요" />
+
+
+        <EditText
+            android:id="@+id/edit_title"
+            android:layout_width="380dp"
+            android:layout_height="42dp"
+            android:layout_marginTop="20dp"
+            android:ems="10"
+            android:hint="Title"
+            android:inputType="textPersonName"
+            app:layout_constraintBottom_toTopOf="@+id/edit_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ivUser"
+            tools:ignore="LabelFor,MissingConstraints" />
+
+        <EditText
+            android:id="@+id/edit_content"
+            android:layout_width="380dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:ems="10"
+            android:hint="Content"
+            android:inputType="textPersonName"
+            app:layout_constraintBottom_toTopOf="@+id/edit_time"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_title"
+            tools:ignore="LabelFor,MissingConstraints" />
+
+        <EditText
+            android:id="@+id/edit_time"
+            android:layout_width="380dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="47dp"
+            android:layout_marginTop="5dp"
+            android:ems="10"
+            android:hint="Time"
+            android:inputType="textPersonName"
+            app:layout_constraintBottom_toTopOf="@+id/button2"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_content"
+            tools:ignore="LabelFor,MissingConstraints" />
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="296dp"
+            android:onClick="saveItem"
+            android:text="Button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_time"
+            tools:ignore="MissingConstraints" />
+
 
     </LinearLayout>
 
-    <EditText
-        android:id="@+id/edit_title"
-        android:layout_width="380dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="4dp"
-        android:ems="10"
-        android:hint="Title"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/edit_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="LabelFor,MissingConstraints" />
-
-    <EditText
-        android:id="@+id/edit_content"
-        android:layout_width="380dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:ems="10"
-        android:hint="Content"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/edit_time"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_title"
-        tools:ignore="LabelFor,MissingConstraints" />
-
-    <EditText
-        android:id="@+id/edit_time"
-        android:layout_width="380dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="46dp"
-        android:ems="10"
-        android:hint="Time"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/button2"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_content"
-        tools:ignore="LabelFor,MissingConstraints" />
-
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="325dp"
-        android:layout_marginEnd="296dp"
-        android:layout_marginTop="1dp"
-        android:onClick="saveItem"
-        android:text="Button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_time"
-        tools:ignore="MissingConstraints" />
 
 </android.support.constraint.ConstraintLayout>
