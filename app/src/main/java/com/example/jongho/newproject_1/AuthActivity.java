@@ -82,7 +82,7 @@ public class AuthActivity extends AppCompatActivity implements GoogleApiClient.O
             public void onSuccess(AuthResult authResult) {
 //                FirebaseUser firebaseUser = authResult.getUser();
 //                Toast.makeText(AuthActivity.this, firebaseUser.getEmail(), Toast.LENGTH_LONG).show();
-                startActivity(new Intent(AuthActivity.this, MapsActivity.class));
+                startActivity(new Intent(AuthActivity.this, MainActivity.class));
                 finish();
             }
         });

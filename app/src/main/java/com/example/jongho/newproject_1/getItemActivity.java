@@ -107,9 +107,9 @@ public class getItemActivity extends AppCompatActivity
 
 
         // 입력한 정보 가져오기
-        EditText edittitle = (EditText)findViewById(R.id.edit_title);
-        EditText editcontent = (EditText)findViewById(R.id.edit_content);
-        EditText edittime = (EditText)findViewById(R.id.edit_time);
+        EditText edittitle = (EditText)findViewById(R.id.edit_Gettitle);
+        EditText editcontent = (EditText)findViewById(R.id.edit_Getcontent);
+        EditText edittime = (EditText)findViewById(R.id.edit_Gettime);
 
         // 저장할 정보
         double i = 0;
@@ -125,7 +125,6 @@ public class getItemActivity extends AppCompatActivity
         DatabaseReference mFireRef = mFireDB.getReference("getItem/"+mFirebaseAuth.getCurrentUser().getUid()).push();
         mFireRef.setValue(saveitem);
         String postId = mFireRef.getKey();
-//                mFireDB.getReference("getItem/"+mFirebaseAuth.getCurrentUser().getUid()+"").push().setValue(saveitem)
 
         // firestorage 에 이미지 업로드
         uploadImage(postId);
@@ -135,8 +134,7 @@ public class getItemActivity extends AppCompatActivity
         editcontent.setText("");
         edittime.setText("");
 
-        finish();
-
+        startActivity(new Intent(this, MainActivity.class));
         // 화면전환 애니메이션 효과
        overridePendingTransition(R.anim.anim_slide_in_left,R.anim.anim_slide_out_right);
     }
@@ -205,23 +203,28 @@ public class getItemActivity extends AppCompatActivity
             return;
         }
 
-
-        Toast.makeText(this, "start uploadImages == " + getitemkey, Toast.LENGTH_SHORT).show();
         //파이어스토어 접근 레퍼런스    // getItem/image/uid/randomkey.jpg
-        Toast.makeText(this, "start uploadImages == " + mFirebaseAuth.getCurrentUser().getUid(), Toast.LENGTH_SHORT).show();
         StorageReference reference = mStorageRef.child("getItem/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+getitemkey +".jpg");
 
 
-        //파이어베이스스에 쓰이는 데이터로 이미지 변환
+        //파이어베이스에 쓰이는 데이터로 이미지 변환
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        try {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            Toast.makeText(this, "Don't image", Toast.LENGTH_SHORT).show();
+
+        } catch ( NullPointerException e ) {
+            return ;
+        }
         byte[] data = baos.toByteArray();
+
 
         UploadTask uploadTask = reference.putBytes(data);
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle unsuccessful uploads
+                return;
             }
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -350,9 +353,6 @@ public class getItemActivity extends AppCompatActivity
 
                     //이미지 뷰에 비트맵 부착
                     imageViewgetItem.setImageBitmap(bitmap);
-
-//                    // firestorage 에 이미지 업로드
-//                    uploadImage();
 
                 } catch (IOException e) {
                     e.printStackTrace();
