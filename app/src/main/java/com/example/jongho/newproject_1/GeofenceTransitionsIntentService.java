@@ -1,8 +1,8 @@
 package com.example.jongho.newproject_1;
 
 import android.app.IntentService;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -76,11 +76,15 @@ public class GeofenceTransitionsIntentService extends IntentService {
         String IDs = TextUtils.join(", ", triggeringGeofencesldsList);
 
         int transitiontype = event.getGeofenceTransition();
+
         if(transitiontype == Geofence.GEOFENCE_TRANSITION_ENTER) {
             Log.e("haha", "Enter into " + IDs);
         }
+        if(transitiontype == Geofence.GEOFENCE_TRANSITION_DWELL) {
+            Log.e("haha", "DWELL " + IDs);
+        }
         if(transitiontype == Geofence.GEOFENCE_TRANSITION_EXIT) {
-            Log.e("haha", "Exit from " + IDs);
+            Log.e("haha", "Exit from " + IDs+event.getTriggeringLocation().getLatitude() + ""+event.getTriggeringLocation().getLongitude());
         }
     }
 

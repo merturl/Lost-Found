@@ -1,9 +1,11 @@
 package com.example.jongho.newproject_1;
 
 import android.Manifest;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.location.Location;
 import android.os.Bundle;
@@ -21,6 +23,9 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -34,6 +39,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -55,10 +62,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final int REQUEST_PERMISSIONS_LOCATION_SETTINGS_REQUEST_CODE = 33;
     private static final int REQUEST_PERMISSIONS_LAST_LOCATION_REQUEST_CODE = 34;
     private static final int REQUEST_PERMISSIONS_CURRENT_LOCATION_REQUEST_CODE = 35;
+    private static final int REQUEST_PERMISSIONS_GEOFENCE_REQUEST_CODE = 36;
+    private static final int CIRCLE_BOUND = 50;
     //Google location API
     private FusedLocationProviderClient mFusedLocationClient;
     //Location Request Interval
     protected static long MIN_UPDATE_INTERVAL = 1 * 1000; // 1  minute is the minimum Android recommends, but we use 30 seconds
+    private GeofencingClient geofencingClient;
 
     //LocationRequest
     LocationRequest locationRequest;
@@ -70,6 +80,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     GoogleMap googleMap = null;
     //Marker
     Marker currentMaker;
+    Circle mapCircle;
+
+    PendingIntent pendingIntent = null;
 
     // Firebase 객체 생성
     private FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
@@ -86,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //fuseLocationClient init
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        geofencingClient = LocationServices.getGeofencingClient(this);
 
         //checkforlocation
         checkForLocationRequest();
@@ -139,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             ex.printStackTrace();
         }
     }
+
     public void callCurrentLocation() {
         try {
             if (
@@ -159,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 requestPermissions(REQUEST_PERMISSIONS_CURRENT_LOCATION_REQUEST_CODE);
                 return;
             }
-            Log.d("haha","hshs");
+            Log.d("haha", "hshs");
             //currentLocations update time(interval time)
             mFusedLocationClient.requestLocationUpdates(locationRequest, new LocationCallback() {
                 @Override
@@ -168,20 +183,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     if (currentMaker != null) {
                         currentMaker.remove();
                     }
+                    if(mapCircle!=null){
+                        mapCircle.remove();
+                    }
 
                     currentLocation = locationResult.getLastLocation();
-                    Log.d("haha","hshs"+  String.valueOf(currentLocation.getLatitude()) + String.valueOf(currentLocation.getLongitude()));
+                    Log.d("haha", "hshs" + String.valueOf(currentLocation.getLatitude()) + String.valueOf(currentLocation.getLongitude()));
                     LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
 
                     //current location add in googleMap
 //                    resultTextView.setText(result);
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(latLng);
-                    markerOptions.title("Current Position"+latLng.latitude + "/" +latLng.longitude);
+                    markerOptions.title("Current Position" + latLng.latitude + "/" + latLng.longitude);
                     markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
                     currentMaker = googleMap.addMarker(markerOptions);
 
+
                     //Marker trace to camera
+                    mapCircle = googleMap.addCircle(new CircleOptions().center(latLng).radius(CIRCLE_BOUND).strokeColor(Color.parseColor("#884169e1")).fillColor(Color.parseColor("#5587cefa")));
                     googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                 }
             }, Looper.myLooper());
@@ -204,6 +224,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                             if (currentMaker != null) {
                                 currentMaker.remove();
+                            }
+
+                            if (lastLocation != null) {
+                                Log.d("haha", "addgeofence" + lastLocation.getLongitude()+ "+" +lastLocation.getLatitude());
+                                geofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent()).addOnSuccessListener(MainActivity.this, new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(MainActivity.this, "SuccessAddGeofence", Toast.LENGTH_LONG).show();
+                                    }
+                                }).addOnFailureListener(MainActivity.this, new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(MainActivity.this, "failaddGeofence", Toast.LENGTH_LONG).show();
+                                    }
+                                });
                             }
                             LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
 
@@ -239,9 +274,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void startLocationPermissionRequest(int requestCode) {
-        String[] permissions = new String[] {Manifest.permission.INTERNET, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
+        String[] permissions = new String[]{Manifest.permission.INTERNET, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
         ActivityCompat.requestPermissions(MainActivity.this, permissions, requestCode);
     }
+
     private void requestPermissions(final int requestCode) {
 //        Check if user has denied
         boolean shouldProvideRationale = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION);
@@ -263,7 +299,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    public void checkForLocationRequest(){
+    public void checkForLocationRequest() {
         locationRequest = LocationRequest.create();
         locationRequest.setInterval(MIN_UPDATE_INTERVAL);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -479,6 +515,34 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             backPressedTime = tempTime;
             Toast.makeText(this, "Are you exit?", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private Geofence getGeofence(){
+        //지오 펜스 생성
+        Geofence geofence = new Geofence.Builder().setRequestId("User").setCircularRegion(lastLocation.getLatitude(), lastLocation.getLongitude(), CIRCLE_BOUND).setExpirationDuration(360000)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT).build();
+        return geofence;
+    }
+
+    private GeofencingRequest getGeofencingRequest() {
+        //Geofencing Return
+        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_DWELL);
+        builder.addGeofence(getGeofence());
+        return builder.build();
+    }
+
+    private PendingIntent getGeofencePendingIntent() {
+        // Reuse the PendingIntent if we already have it.
+        if (pendingIntent != null) {
+            return pendingIntent;
+        }
+        Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
+        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when
+        // calling addGeofences() and removeGeofences().
+        pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.
+                FLAG_UPDATE_CURRENT);
+        return pendingIntent;
     }
 }
 
