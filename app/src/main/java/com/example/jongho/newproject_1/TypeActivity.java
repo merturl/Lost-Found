@@ -6,11 +6,19 @@ import android.os.Bundle;
 import android.view.View;
 
 public class TypeActivity extends AppCompatActivity {
+    double lat;
+    double lng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_type);
+
+        // 좌표 가져오기
+        double i =0;
+        Intent getintent = getIntent();
+        lat = getintent.getDoubleExtra("lat", i);
+        lng = getintent.getDoubleExtra("lng", i);
     }
 
     public void moveGetItem(View view) {
@@ -18,7 +26,9 @@ public class TypeActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.anim_slide_in_right,R.anim.anim_slide_out_left);
     }
 
-    public void moveLostItem() {
+    public void moveLostItem(View view) {
+        startActivity ( new Intent(this, LostItemActivity.class));
+        overridePendingTransition(R.anim.anim_slide_in_right,R.anim.anim_slide_out_left);
 
     }
 
