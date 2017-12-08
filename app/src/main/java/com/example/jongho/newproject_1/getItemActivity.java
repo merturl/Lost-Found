@@ -97,8 +97,13 @@ public class getItemActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+    }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
 
+        finish();
     }
 
     // DB에 아이템 저장

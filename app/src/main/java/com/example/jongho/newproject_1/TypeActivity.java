@@ -21,6 +21,13 @@ public class TypeActivity extends AppCompatActivity {
         lng = getintent.getDoubleExtra("lng", i);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        finish();
+    }
+
     public void moveGetItem(View view) {
         // getItemActivity 전환 인텐트
         Intent intent = new Intent(this, getItemActivity.class);

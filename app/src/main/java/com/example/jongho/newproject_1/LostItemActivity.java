@@ -73,6 +73,13 @@ public class LostItemActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        finish();
+    }
+
     // DB에 아이템 저장
     public void saveLostItem(View v) {
         Intent getIntent = getIntent();
