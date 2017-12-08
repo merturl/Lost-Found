@@ -100,11 +100,11 @@ public class LostItemActivity extends AppCompatActivity {
 
 
         // 아이템 저장 lat, lng,  title, content, time
-        lostItem saveitem = new lostItem(lat, lng, title, content);
+        Item saveitem = new Item(lat, lng, title, content);
         DatabaseReference mFireRef = mFireDB.getReference("lostItem/"+mFirebaseAuth.getCurrentUser().getUid()).push();
         mFireRef.setValue(saveitem);
         String postId = mFireRef.getKey();
-//                mFireDB.getReference("getItem/"+mFirebaseAuth.getCurrentUser().getUid()+"").push().setValue(saveitem)
+//                mFireDB.getReference("Item/"+mFirebaseAuth.getCurrentUser().getUid()+"").push().setValue(saveitem)
 
         // firestorage 에 이미지 업로드
         uploadImage(postId);
@@ -128,7 +128,7 @@ public class LostItemActivity extends AppCompatActivity {
 
 
         Toast.makeText(this, "start uploadImages == " + lostitemkey, Toast.LENGTH_SHORT).show();
-        //파이어스토어 접근 레퍼런스    // getItem/image/uid/randomkey.jpg
+        //파이어스토어 접근 레퍼런스    // Item/image/uid/randomkey.jpg
         Toast.makeText(this, "start uploadImages == " + mFirebaseAuth.getCurrentUser().getUid(), Toast.LENGTH_SHORT).show();
         StorageReference reference = mStorageRef.child("lostItem/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+lostitemkey +".jpg");
 

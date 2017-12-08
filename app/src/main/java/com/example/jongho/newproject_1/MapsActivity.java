@@ -278,13 +278,13 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
 
     // Firebase 변화 수신
     private void display() {
-        mFireDB.getReference("getItem/"+mFirebaseAuth.getCurrentUser().getUid())
+        mFireDB.getReference("Item/"+mFirebaseAuth.getCurrentUser().getUid())
                 .addChildEventListener(new ChildEventListener() {
 
                     // 리스트의 아이템을 검색하거나 아이템 추가가 있을 때 수신
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        getItem getitem = dataSnapshot.getValue(com.example.jongho.newproject_1.getItem.class);
+                        Item getitem = dataSnapshot.getValue(Item.class);
 
                         // 구글맵에 마커 추가
                         MapsActivity.this.googleMap.addMarker(new MarkerOptions()
