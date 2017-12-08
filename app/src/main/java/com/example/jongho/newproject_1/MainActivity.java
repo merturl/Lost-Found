@@ -71,8 +71,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     //GoogleMap
     GoogleMap googleMap = null;
     //Marker
-    Marker currentMaker;
-
+    Marker currentMarker;
+    Marker addMarker;
     // Firebase 객체 생성
     private FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase mFireDB = FirebaseDatabase.getInstance();
@@ -166,9 +166,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             mFusedLocationClient.requestLocationUpdates(locationRequest, new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
-                    //if currentMaker is already exist then remove marker
-                    if (currentMaker != null) {
-                        currentMaker.remove();
+                    //if currentMarker is already exist then remove marker
+                    if (currentMarker != null) {
+                        currentMarker.remove();
                     }
 
                     currentLocation = locationResult.getLastLocation();
@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                     markerOptions.position(latLng);
                     markerOptions.title("Current Position"+latLng.latitude + "/" +latLng.longitude);
                     markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-                    currentMaker = googleMap.addMarker(markerOptions);
+                    currentMarker = googleMap.addMarker(markerOptions);
 
                     //Marker trace to camera
                     googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -204,8 +204,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                         if (task.isSuccessful() && task.getResult() != null) {
                             lastLocation = task.getResult();
 
-                            if (currentMaker != null) {
-                                currentMaker.remove();
+                            if (currentMarker != null) {
+                                currentMarker.remove();
                             }
                             LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
 
@@ -214,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                             markerOptions.position(latLng);
                             markerOptions.title("Last Position");
                             markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-                            currentMaker = googleMap.addMarker(markerOptions);
+                            currentMarker = googleMap.addMarker(markerOptions);
 
                             googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                         } else {
@@ -359,8 +359,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         this.googleMap.setMaxZoomPreference(18.0f);
 //        this.googleMap.setLatLngBoundsForCameraTarget(MJU_BOUND);
 
-        // Click이벤트
-        this.googleMap.setOnMapClickListener(this);
+        // 마커 클릭 이벤트
+        this.googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+//                Toast.makeText(getContext(), marker.getPosition().toString(), Toast.LENGTH_LONG).show();
+                Intent ItemView = new Intent(MainActivity.this, ItemViewActivity.class);
+                ItemView.putExtra("ItemRef", marker.getTag().toString());
+                startActivity(ItemView);
+                return true;
+            }
+        });
         this.googleMap.setOnMapLongClickListener(this);
 
         display();
@@ -393,6 +402,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         Log.d("haha", "HHHH");
     }
 
+
+
     // Firebase 변화 수신
     private void display() {
         // getItem 수신
@@ -405,10 +416,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                         getItem getitem = dataSnapshot.getValue(com.example.jongho.newproject_1.getItem.class);
 
                         // 구글맵에 마커 추가
-                        MainActivity.this.googleMap.addMarker(new MarkerOptions()
+                        addMarker = MainActivity.this.googleMap.addMarker(new MarkerOptions()
+                                
                                 .position(new LatLng(getitem.getLat(), getitem.getLng()))
                                 .title(getitem.getTitle())
                                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_getitem)));
+
+                        addMarker.setTag("getItem/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
                     }
 
                     // 아이템 변화가 있을 때 수신

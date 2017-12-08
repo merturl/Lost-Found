@@ -292,7 +292,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
                                 .title(getitem.getTitle())
                                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_getitem)));
 
-//                        Toast.makeText(MapsActivity.this, getitem.getTitle(), Toast.LENGTH_SHORT).show();
                     }
 
                     // 아이템 변화가 있을 때 수신
