@@ -21,13 +21,28 @@ public class TypeActivity extends AppCompatActivity {
         lng = getintent.getDoubleExtra("lng", i);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        finish();
+    }
+
     public void moveGetItem(View view) {
-        startActivity ( new Intent(this, getItemActivity.class));
+        // getItemActivity 전환 인텐트
+        Intent intent = new Intent(this, getItemActivity.class);
+        intent.putExtra("lat", lat);
+        intent.putExtra("lng", lng);
+        startActivity(intent);
         overridePendingTransition(R.anim.anim_slide_in_right,R.anim.anim_slide_out_left);
     }
 
     public void moveLostItem(View view) {
-        startActivity ( new Intent(this, LostItemActivity.class));
+        // getItemActivity 전환 인텐트
+        Intent intent = new Intent(this, LostItemActivity.class);
+        intent.putExtra("lat", lat);
+        intent.putExtra("lng", lng);
+        startActivity(intent);
         overridePendingTransition(R.anim.anim_slide_in_right,R.anim.anim_slide_out_left);
 
     }

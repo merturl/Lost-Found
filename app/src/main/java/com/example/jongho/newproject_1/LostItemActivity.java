@@ -73,6 +73,13 @@ public class LostItemActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        finish();
+    }
+
     // DB에 아이템 저장
     public void saveLostItem(View v) {
         Intent getIntent = getIntent();
@@ -128,7 +135,12 @@ public class LostItemActivity extends AppCompatActivity {
 
         //파이어베이스스에 쓰이는 데이터로 이미지 변환
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        try {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+
+        } catch ( NullPointerException e ) {
+            return ;
+        }
         byte[] data = baos.toByteArray();
 
         UploadTask uploadTask = reference.putBytes(data);

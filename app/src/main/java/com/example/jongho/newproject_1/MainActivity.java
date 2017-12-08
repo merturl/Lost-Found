@@ -1,8 +1,11 @@
 package com.example.jongho.newproject_1;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Point;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
@@ -40,6 +43,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
 
 //MainAcritivity
 public class MainActivity extends AppCompatActivity implements LocationListener, OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener {
@@ -64,6 +72,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     GoogleMap googleMap = null;
     //Marker
     Marker currentMaker;
+
+    // Firebase 객체 생성
+    private FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
+    private FirebaseDatabase mFireDB = FirebaseDatabase.getInstance();
+
+    // If Activity exit
+    private final long FINISH_INTERVAL_TIME = 2000;
+    private long backPressedTime = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -93,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         if (result != ConnectionResult.SUCCESS && result != ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED) {
             Toast.makeText(this, "Are you running in Emulator ? try a real device.", Toast.LENGTH_SHORT).show();
         }
+
     }
 
     @Override
@@ -346,10 +363,22 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         this.googleMap.setOnMapClickListener(this);
         this.googleMap.setOnMapLongClickListener(this);
 
+        display();
+
     }
 
     @Override
     public void onMapClick(LatLng latLng) {
+        Point clickPoint = this.googleMap.getProjection().toScreenLocation(latLng);
+        LatLng point = this.googleMap.getProjection().fromScreenLocation(clickPoint);
+        Toast.makeText(this, "Click Point Lat : " + point.latitude + " Lon : " + point.longitude, Toast.LENGTH_LONG).show();
+
+        // getItemActivity 전환 인텐트
+        Intent intent = new Intent(this, TypeActivity.class);
+        intent.putExtra("lat", point.latitude);
+        intent.putExtra("lng", point.longitude);
+        startActivity(intent);
+        overridePendingTransition(R.anim.anim_slide_in_right,R.anim.anim_slide_out_left);
 
     }
 
@@ -362,6 +391,102 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     public void onLocationChanged(Location location) {
         callCurrentLocation();
         Log.d("haha", "HHHH");
+    }
+
+    // Firebase 변화 수신
+    private void display() {
+        // getItem 수신
+        mFireDB.getReference("getItem/"+mFirebaseAuth.getCurrentUser().getUid())
+                .addChildEventListener(new ChildEventListener() {
+
+                    // 리스트의 아이템을 검색하거나 아이템 추가가 있을 때 수신
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        getItem getitem = dataSnapshot.getValue(com.example.jongho.newproject_1.getItem.class);
+
+                        // 구글맵에 마커 추가
+                        MainActivity.this.googleMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(getitem.getLat(), getitem.getLng()))
+                                .title(getitem.getTitle())
+                                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_getitem)));
+                    }
+
+                    // 아이템 변화가 있을 때 수신
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    // 아이템이 삭제 되었을 때 수신
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    // 순서가 있는 리스트에서 순서가 변경 되었을 때 수신
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+        // lostItem 수신
+        mFireDB.getReference("lostItem/"+mFirebaseAuth.getCurrentUser().getUid())
+                .addChildEventListener(new ChildEventListener() {
+
+                    // 리스트의 아이템을 검색하거나 아이템 추가가 있을 때 수신
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        getItem getitem = dataSnapshot.getValue(com.example.jongho.newproject_1.getItem.class);
+
+                        // 구글맵에 마커 추가
+                        MainActivity.this.googleMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(getitem.getLat(), getitem.getLng()))
+                                .title(getitem.getTitle())
+                                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_lostitem)));
+                    }
+
+                    // 아이템 변화가 있을 때 수신
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    // 아이템이 삭제 되었을 때 수신
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    // 순서가 있는 리스트에서 순서가 변경 되었을 때 수신
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+    }
+
+    @Override
+    public void onBackPressed() {
+        long tempTime = System.currentTimeMillis();
+        long intervalTime = tempTime - backPressedTime;
+
+        if (0 <= intervalTime && FINISH_INTERVAL_TIME >= intervalTime) {
+            super.onBackPressed();
+        } else {
+            backPressedTime = tempTime;
+            Toast.makeText(this, "Are you exit?", Toast.LENGTH_SHORT).show();
+        }
     }
 }
 

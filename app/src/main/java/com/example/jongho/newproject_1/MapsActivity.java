@@ -251,7 +251,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         MarkerOptions currentMarker = new MarkerOptions();
         currentMarker.position(new LatLng(mLocation.getLatitude(), mLocation.getLongitude())).title("Current Position!")
                 .title("내위치")
-                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_announcement));
+                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_getitem));
         this.googleMap.addMarker(currentMarker);
         this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(currentMarker.getPosition()));
     }
@@ -290,7 +290,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
                         MapsActivity.this.googleMap.addMarker(new MarkerOptions()
                                 .position(new LatLng(getitem.getLat(), getitem.getLng()))
                                 .title(getitem.getTitle())
-                                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_announcement)));
+                                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_getitem)));
 
 //                        Toast.makeText(MapsActivity.this, getitem.getTitle(), Toast.LENGTH_SHORT).show();
                     }
