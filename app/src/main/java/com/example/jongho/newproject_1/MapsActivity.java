@@ -264,7 +264,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
 //        Toast.makeText(this, "Click Point Lat : " + point.latitude + " Lon : " + point.longitude, Toast.LENGTH_LONG).show();
 
         // getItemActivity 전환 인텐트
-        Intent intent = new Intent(this, getItemActivity.class);
+        Intent intent = new Intent(this, TypeActivity.class);
         intent.putExtra("lat", point.latitude);
         intent.putExtra("lng", point.longitude);
         startActivity(intent);

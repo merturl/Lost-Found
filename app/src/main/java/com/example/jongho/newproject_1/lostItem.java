@@ -1,48 +1,44 @@
 package com.example.jongho.newproject_1;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Created by woong on 2017-12-05.
+ * Created by woong on 2017-12-08.
  */
 
-public class getItem {
-
-
+public class lostItem {
     private double lat;
     private double lng;
     private String title;
     private String content;
-    private String gettime;
+    private String losttime;
     private String uri;
 
     // 생성자
-    public getItem() { }
+    public lostItem() { }
 
     // lat, lng, title, content, time
-    public getItem(double lat, double lng, String title, String content,  String gettime) {
+    public lostItem(double lat, double lng, String title, String content,  String losttime) {
         this.lat = lat;
         this.lng = lng;
         this.title = title;
         this.content = content;
-        this.gettime = gettime;
+        this.losttime = losttime;
     }
 
     // 시간을 입력안했을 때 default로 현재 시각
-    public getItem(double lat, double lng, String title, String content) {
+    public lostItem(double lat, double lng, String title, String content) {
         this.lat = lat;
         this.lng = lng;
         this.title = title;
         this.content = content;
-        this.gettime = new SimpleDateFormat("yyyy-MM-dd").format(new Date(System.currentTimeMillis()));
+        this.losttime = new SimpleDateFormat("yyyy-MM-dd").format(new Date(System.currentTimeMillis()));
     }
 
 
 
-    public String getTitle() {
+    public String lostTitle() {
         return title;
     }
 
@@ -58,12 +54,12 @@ public class getItem {
         this.content = content;
     }
 
-    public String getGettime() {
-        return gettime;
+    public String getlosttime() {
+        return losttime;
     }
 
-    public void setGettime(String gettime) {
-        this.gettime = gettime;
+    public void setlosttime(String losttime) {
+        this.losttime = losttime;
     }
 
     public double getLat() {

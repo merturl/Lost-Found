@@ -1,6 +1,5 @@
 package com.example.jongho.newproject_1;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -9,19 +8,12 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.LogPrinter;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -30,22 +22,16 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
-import java.io.Console;
 import java.io.IOException;
 
-
-public class getItemActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class LostItemActivity extends AppCompatActivity {
 
     private ImageView imageViewgetItem;
     private StorageReference mStorageRef;
@@ -55,30 +41,12 @@ public class getItemActivity extends AppCompatActivity
     private FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase mFireDB = FirebaseDatabase.getInstance();
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_get_item);
+        setContentView(R.layout.activity_lost_item);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        //외부 저장소 사진 읽기, 쓰기 권한 체크
-        checkPerssions();
-        mStorageRef = FirebaseStorage.getInstance().getReference();
-
-        //imgview에 리스너를 달아 이미지뷰 클릭시 이미지 추가를 함
-        imageViewgetItem = (ImageView) findViewById(R.id.getImage);
-        imageViewgetItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //이미지 선택할 수 있는 엑티비티 창 호출
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intent, 1);
-            }
-        });
-
-
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -89,27 +57,31 @@ public class getItemActivity extends AppCompatActivity
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+        //외부 저장소 사진 읽기, 쓰기 권한 체크
+        checkPerssions();
+        mStorageRef = FirebaseStorage.getInstance().getReference();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-
+        //imgview에 리스너를 달아 이미지뷰 클릭시 이미지 추가를 함
+        imageViewgetItem = (ImageView) findViewById(R.id.lostImage);
+        imageViewgetItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //이미지 선택할 수 있는 엑티비티 창 호출
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, 1);
+            }
+        });
     }
 
     // DB에 아이템 저장
-    public void saveGetItem(View v) {
+    public void saveLostItem(View v) {
         Intent getIntent = getIntent();
 
 
         // 입력한 정보 가져오기
-        EditText edittitle = (EditText)findViewById(R.id.edit_title);
-        EditText editcontent = (EditText)findViewById(R.id.edit_content);
-        EditText edittime = (EditText)findViewById(R.id.edit_time);
+        EditText edittitle = (EditText)findViewById(R.id.edit_Losttitle);
+        EditText editcontent = (EditText)findViewById(R.id.edit_Lostcontent);
+        EditText edittime = (EditText)findViewById(R.id.edit_Losttime);
 
         // 저장할 정보
         double i = 0;
@@ -121,8 +93,8 @@ public class getItemActivity extends AppCompatActivity
 
 
         // 아이템 저장 lat, lng,  title, content, time
-        getItem saveitem = new getItem(lat, lng, title, content);
-        DatabaseReference mFireRef = mFireDB.getReference("getItem/"+mFirebaseAuth.getCurrentUser().getUid()).push();
+        lostItem saveitem = new lostItem(lat, lng, title, content);
+        DatabaseReference mFireRef = mFireDB.getReference("lostItem/"+mFirebaseAuth.getCurrentUser().getUid()).push();
         mFireRef.setValue(saveitem);
         String postId = mFireRef.getKey();
 //                mFireDB.getReference("getItem/"+mFirebaseAuth.getCurrentUser().getUid()+"").push().setValue(saveitem)
@@ -138,78 +110,20 @@ public class getItemActivity extends AppCompatActivity
         finish();
 
         // 화면전환 애니메이션 효과
-       overridePendingTransition(R.anim.anim_slide_in_left,R.anim.anim_slide_out_right);
-    }
-
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.get_item, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
+        overridePendingTransition(R.anim.anim_slide_in_left,R.anim.anim_slide_out_right);
     }
 
     //파이어스토어에 이미지 저장
-    public void uploadImage(String getitemkey){
-        if(getitemkey == null ) {
+    public void uploadImage(String lostitemkey){
+        if(lostitemkey == null ) {
             return;
         }
 
 
-        Toast.makeText(this, "start uploadImages == " + getitemkey, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "start uploadImages == " + lostitemkey, Toast.LENGTH_SHORT).show();
         //파이어스토어 접근 레퍼런스    // getItem/image/uid/randomkey.jpg
         Toast.makeText(this, "start uploadImages == " + mFirebaseAuth.getCurrentUser().getUid(), Toast.LENGTH_SHORT).show();
-        StorageReference reference = mStorageRef.child("getItem/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+getitemkey +".jpg");
+        StorageReference reference = mStorageRef.child("lostItem/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+lostitemkey +".jpg");
 
 
         //파이어베이스스에 쓰이는 데이터로 이미지 변환
@@ -228,10 +142,10 @@ public class getItemActivity extends AppCompatActivity
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
 //                Uri downloadUrl = taskSnapshot.getDownloadUrl(); //이미지가 저장된 주소의 URL
-                Toast.makeText(getItemActivity.this, "이미지 저장 성공", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LostItemActivity.this, "이미지 저장 성공", Toast.LENGTH_SHORT).show();
             }
         });
-        Toast.makeText(getItemActivity.this, "return uri== " + getitemkey, Toast.LENGTH_LONG).show();
+        Toast.makeText(LostItemActivity.this, "return uri== " + lostitemkey, Toast.LENGTH_LONG).show();
 
     }
 
@@ -361,4 +275,5 @@ public class getItemActivity extends AppCompatActivity
         }
 
     }
+
 }
