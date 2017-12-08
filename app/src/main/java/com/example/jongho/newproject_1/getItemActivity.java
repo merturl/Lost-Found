@@ -1,6 +1,5 @@
 package com.example.jongho.newproject_1;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -19,7 +18,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.LogPrinter;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,17 +28,13 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
-import java.io.Console;
 import java.io.IOException;
 
 
@@ -66,6 +60,7 @@ public class getItemActivity extends AppCompatActivity
         //외부 저장소 사진 읽기, 쓰기 권한 체크
         checkPerssions();
         mStorageRef = FirebaseStorage.getInstance().getReference();
+
 
         //imgview에 리스너를 달아 이미지뷰 클릭시 이미지 추가를 함
         imageViewgetItem = (ImageView) findViewById(R.id.getImage);
@@ -100,10 +95,8 @@ public class getItemActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-
-        finish();
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     // DB에 아이템 저장
@@ -126,7 +119,7 @@ public class getItemActivity extends AppCompatActivity
 
 
         // 아이템 저장 lat, lng,  title, content, time
-        getItem saveitem = new getItem(lat, lng, title, content);
+        Item saveitem = new Item(lat, lng, title, content);
         DatabaseReference mFireRef = mFireDB.getReference("getItem/"+mFirebaseAuth.getCurrentUser().getUid()).push();
         mFireRef.setValue(saveitem);
         String postId = mFireRef.getKey();
@@ -208,8 +201,8 @@ public class getItemActivity extends AppCompatActivity
             return;
         }
 
-        //파이어스토어 접근 레퍼런스    // getItem/image/uid/randomkey.jpg
-        StorageReference reference = mStorageRef.child("getItem/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+getitemkey +".jpg");
+        //파이어스토어 접근 레퍼런스    // Item/image/uid/randomkey.jpg
+        StorageReference reference = mStorageRef.child("Item/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+getitemkey +".jpg");
 
 
         //파이어베이스에 쓰이는 데이터로 이미지 변환

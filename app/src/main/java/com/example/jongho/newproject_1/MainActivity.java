@@ -47,6 +47,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.HashMap;
+
 //MainAcritivity
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener {
 
@@ -69,8 +71,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //GoogleMap
     GoogleMap googleMap = null;
     //Marker
-    Marker currentMaker;
-
+    Marker currentMarker;
+    Marker addMarker;
     // Firebase 객체 생성
     private FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase mFireDB = FirebaseDatabase.getInstance();
@@ -164,9 +166,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             mFusedLocationClient.requestLocationUpdates(locationRequest, new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
-                    //if currentMaker is already exist then remove marker
-                    if (currentMaker != null) {
-                        currentMaker.remove();
+                    //if currentMarker is already exist then remove marker
+                    if (currentMarker != null) {
+                        currentMarker.remove();
                     }
 
                     currentLocation = locationResult.getLastLocation();
@@ -179,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     markerOptions.position(latLng);
                     markerOptions.title("Current Position"+latLng.latitude + "/" +latLng.longitude);
                     markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-                    currentMaker = googleMap.addMarker(markerOptions);
+                    currentMarker = googleMap.addMarker(markerOptions);
 
                     //Marker trace to camera
                     googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -202,8 +204,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         if (task.isSuccessful() && task.getResult() != null) {
                             lastLocation = task.getResult();
 
-                            if (currentMaker != null) {
-                                currentMaker.remove();
+                            if (currentMarker != null) {
+                                currentMarker.remove();
                             }
                             LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
 
@@ -212,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             markerOptions.position(latLng);
                             markerOptions.title("Last Position");
                             markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-                            currentMaker = googleMap.addMarker(markerOptions);
+                            currentMarker = googleMap.addMarker(markerOptions);
 
                             googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                         } else {
@@ -357,7 +359,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         this.googleMap.setMaxZoomPreference(18.0f);
 //        this.googleMap.setLatLngBoundsForCameraTarget(MJU_BOUND);
 
-        // Click이벤트
+        // 마커 클릭 이벤트
+        try{
+            this.googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    HashMap<String, Object> tag;
+                    tag = (HashMap) marker.getTag();
+//                Toast.makeText(MainActivity.this, tag.get("ImageRef").toString() , Toast.LENGTH_LONG).show();
+                    Intent ItemView = new Intent(MainActivity.this, ItemViewActivity.class);
+                    ItemView.putExtra("DbRef", tag.get("DbRef").toString());
+                    ItemView.putExtra("ImageRef", tag.get("ImageRef").toString());
+                    startActivity(ItemView);
+                    return true;
+                }
+            });
+        } catch ( NullPointerException e ) {
+            // 본인 마커 찍었을 때 예외처리
+            Toast.makeText(this, "Sorry, Click other point", Toast.LENGTH_SHORT).show();
+        }
+
+
         this.googleMap.setOnMapClickListener(this);
         this.googleMap.setOnMapLongClickListener(this);
 
@@ -385,22 +407,31 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+
     // Firebase 변화 수신
     private void display() {
-        // getItem 수신
+        // Item 수신
         mFireDB.getReference("getItem/"+mFirebaseAuth.getCurrentUser().getUid())
                 .addChildEventListener(new ChildEventListener() {
 
                     // 리스트의 아이템을 검색하거나 아이템 추가가 있을 때 수신
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        getItem getitem = dataSnapshot.getValue(com.example.jongho.newproject_1.getItem.class);
+                        Item getitem = dataSnapshot.getValue(Item.class);
 
                         // 구글맵에 마커 추가
-                        MainActivity.this.googleMap.addMarker(new MarkerOptions()
+                        addMarker = MainActivity.this.googleMap.addMarker(new MarkerOptions()
+                                
                                 .position(new LatLng(getitem.getLat(), getitem.getLng()))
                                 .title(getitem.getTitle())
                                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_getitem)));
+
+                        HashMap<String, Object> tag = new HashMap<String, Object>();
+                        tag.put("DbRef", "getItem/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
+                        tag.put("ImageRef", "Item/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
+
+                        addMarker.setTag(tag);
+
                     }
 
                     // 아이템 변화가 있을 때 수신
@@ -434,14 +465,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     // 리스트의 아이템을 검색하거나 아이템 추가가 있을 때 수신
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        getItem getitem = dataSnapshot.getValue(com.example.jongho.newproject_1.getItem.class);
+                        Item getitem = dataSnapshot.getValue(Item.class);
 
                         // 구글맵에 마커 추가
-                        MainActivity.this.googleMap.addMarker(new MarkerOptions()
+                        addMarker= MainActivity.this.googleMap.addMarker(new MarkerOptions()
                                 .position(new LatLng(getitem.getLat(), getitem.getLng()))
                                 .title(getitem.getTitle())
                                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_lostitem)));
+
+                        HashMap<String, Object> tag = new HashMap<String, Object>();
+                        tag.put("DbRef", "lostItem/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
+                        tag.put("ImageRef", "Item/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
+
+                        addMarker.setTag(tag);
                     }
+
+
 
                     // 아이템 변화가 있을 때 수신
                     @Override
