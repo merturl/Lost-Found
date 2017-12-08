@@ -1,7 +1,6 @@
 package com.example.jongho.newproject_1;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -23,7 +22,6 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
@@ -50,7 +48,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 
 //MainAcritivity
-public class MainActivity extends AppCompatActivity implements LocationListener, OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     //PerMissionCode
@@ -385,12 +383,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     @Override
     public void onMapLongClick(LatLng latLng) {
 
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        callCurrentLocation();
-        Log.d("haha", "HHHH");
     }
 
     // Firebase 변화 수신
