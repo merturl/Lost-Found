@@ -45,13 +45,13 @@ import com.google.android.gms.tasks.Task;
 public class MainActivity extends AppCompatActivity implements LocationListener, OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-//PerMissionCode
+    //PerMissionCode
     private static final int REQUEST_PERMISSIONS_LOCATION_SETTINGS_REQUEST_CODE = 33;
     private static final int REQUEST_PERMISSIONS_LAST_LOCATION_REQUEST_CODE = 34;
     private static final int REQUEST_PERMISSIONS_CURRENT_LOCATION_REQUEST_CODE = 35;
-//Google location API
+    //Google location API
     private FusedLocationProviderClient mFusedLocationClient;
-//Location Request Interval
+    //Location Request Interval
     protected static long MIN_UPDATE_INTERVAL = 1 * 1000; // 1  minute is the minimum Android recommends, but we use 30 seconds
 
     //LocationRequest
@@ -98,56 +98,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     @Override
     public void onStart() {
         super.onStart();
-        try {
-            if (
-                    //permission Check
-                    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    ) {
-
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-
-
-                //Permissions request to user
-                requestPermissions(REQUEST_PERMISSIONS_CURRENT_LOCATION_REQUEST_CODE);
-                return;
-            }
-
-            //currentLocations update time(interval time)
-            mFusedLocationClient.requestLocationUpdates(locationRequest, new LocationCallback() {
-                @Override
-                public void onLocationResult(LocationResult locationResult) {
-                    //if currentMaker is already exist then remove marker
-                    if (currentMaker != null) {
-                        currentMaker.remove();
-                    }
-
-
-                    currentLocation = locationResult.getLastLocation();
-                    Log.d("haha","hshs"+  String.valueOf(currentLocation.getLatitude()) + String.valueOf(currentLocation.getLongitude()));
-                    LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-
-                    //current location add in googleMap
-//                    resultTextView.setText(result);
-                    MarkerOptions markerOptions = new MarkerOptions();
-                    markerOptions.position(latLng);
-                    markerOptions.title("Current Position"+latLng.latitude + "/" +latLng.longitude);
-                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-                    currentMaker = googleMap.addMarker(markerOptions);
-
-                    //Marker trace to camera
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                }
-            }, Looper.myLooper());
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        callCurrentLocation();
     }
 
     public void callLastKnownLocation() {
@@ -174,7 +125,55 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         }
     }
     public void callCurrentLocation() {
+        try {
+            if (
+                //permission Check
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    ) {
 
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+
+
+                //Permissions request to user
+                requestPermissions(REQUEST_PERMISSIONS_CURRENT_LOCATION_REQUEST_CODE);
+                return;
+            }
+            Log.d("haha","hshs");
+            //currentLocations update time(interval time)
+            mFusedLocationClient.requestLocationUpdates(locationRequest, new LocationCallback() {
+                @Override
+                public void onLocationResult(LocationResult locationResult) {
+                    //if currentMaker is already exist then remove marker
+                    if (currentMaker != null) {
+                        currentMaker.remove();
+                    }
+
+                    currentLocation = locationResult.getLastLocation();
+                    Log.d("haha","hshs"+  String.valueOf(currentLocation.getLatitude()) + String.valueOf(currentLocation.getLongitude()));
+                    LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+
+                    //current location add in googleMap
+//                    resultTextView.setText(result);
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    markerOptions.position(latLng);
+                    markerOptions.title("Current Position"+latLng.latitude + "/" +latLng.longitude);
+                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+                    currentMaker = googleMap.addMarker(markerOptions);
+
+                    //Marker trace to camera
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                }
+            }, Looper.myLooper());
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
 
@@ -225,10 +224,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     }
 
     private void startLocationPermissionRequest(int requestCode) {
-        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, requestCode);
+        String[] permissions = new String[] {Manifest.permission.INTERNET, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
+        ActivityCompat.requestPermissions(MainActivity.this, permissions, requestCode);
     }
-
     private void requestPermissions(final int requestCode) {
+//        Check if user has denied
         boolean shouldProvideRationale = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION);
 
         // Provide an additional rationale to the user. This would happen if the user denied the
@@ -364,3 +364,5 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         Log.d("haha", "HHHH");
     }
 }
+
+
