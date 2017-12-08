@@ -1,5 +1,6 @@
 package com.example.jongho.newproject_1;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -18,6 +19,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.LogPrinter;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,10 +40,16 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Console;
 import java.io.IOException;
+
 
 public class getItemActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    public interface Callback {
+        void callback();
+    }
 
     private ImageView imageViewgetItem;
     private StorageReference mStorageRef;
@@ -115,13 +123,18 @@ public class getItemActivity extends AppCompatActivity
         String content = editcontent.getText().toString();
         String time = edittime.getText().toString();
 
-        // firestorage 에 이미지 업로드
-        String uri = uploadImage();
-        Toast.makeText(this, uri, Toast.LENGTH_SHORT).show();
-        // lat, lng,  title, content, time
-        getItem saveitem = new getItem(lat, lng, title, content, uri);
-        mFireDB.getReference("getItem/"+mFirebaseAuth.getCurrentUser().getUid()).push().setValue(saveitem);
 
+        // 아이템 저장 lat, lng,  title, content, time
+        getItem saveitem = new getItem(lat, lng, title, content);
+        DatabaseReference mFireRef = mFireDB.getReference("getItem/"+mFirebaseAuth.getCurrentUser().getUid()).push();
+        mFireRef.setValue(saveitem);
+        String postId = mFireRef.getKey();
+//                mFireDB.getReference("getItem/"+mFirebaseAuth.getCurrentUser().getUid()+"").push().setValue(saveitem)
+
+        // firestorage 에 이미지 업로드
+        uploadImage(postId);
+
+        // 저장 후 입력 내용 초기화
         edittitle.setText("");
         editcontent.setText("");
         edittime.setText("");
@@ -191,11 +204,16 @@ public class getItemActivity extends AppCompatActivity
     }
 
     //파이어스토어에 이미지 저장
-    public String uploadImage(){
-        final String[] uri = new String[1];
+    public void uploadImage(String getitemkey){
+        if(getitemkey == null ) {
+            return;
+        }
 
-        //파이어스토어 접근 레퍼런스
-        StorageReference reference = mStorageRef.child("images/email" + ".jpg");
+
+        Toast.makeText(this, "start uploadImages == " + getitemkey, Toast.LENGTH_SHORT).show();
+        //파이어스토어 접근 레퍼런스    // getItem/image/uid/randomkey.jpg
+        Toast.makeText(this, "start uploadImages == " + mFirebaseAuth.getCurrentUser().getUid(), Toast.LENGTH_SHORT).show();
+        StorageReference reference = mStorageRef.child("getItem/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+getitemkey +".jpg");
 
 
         //파이어베이스스에 쓰이는 데이터로 이미지 변환
@@ -213,32 +231,12 @@ public class getItemActivity extends AppCompatActivity
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                Uri downloadUrl = taskSnapshot.getDownloadUrl(); //이미지가 저장된 주소의 URL
-                uri[0] = downloadUrl.toString();
-                Toast.makeText(getItemActivity.this, "inner uri: " + uri[0], Toast.LENGTH_LONG).show();
-//                //DB에 파이어베이스에 저장된 이미지 주소를 DB에 저장한다.
-//                DatabaseReference reference = FirebaseDatabase.getInstance().getReference("getItem");
-//                reference.child("itemimg").setValue(downloadUrl.toString());
-//                reference.addListenerForSingleValueEvent(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(DataSnapshot dataSnapshot) {
-//                        //데이터가 변할때 즉 DB에 새로운 데이터가 들어오거나 값이 변경될때 이 함수가 호출된다는 의미
-//                        String s = dataSnapshot.getValue().toString();
-//                        Log.d("img", s);
-//                        if(dataSnapshot != null){
-////                            Toast.makeText(this, "사진 업로드 완료",Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(DatabaseError databaseError) {
-//
-//                    }
-//                });
+//                Uri downloadUrl = taskSnapshot.getDownloadUrl(); //이미지가 저장된 주소의 URL
+                Toast.makeText(getItemActivity.this, "이미지 저장 성공", Toast.LENGTH_SHORT).show();
             }
         });
-        Toast.makeText(getItemActivity.this, "return uri== " + uri[0], Toast.LENGTH_LONG).show();
-        return uri[0];
+        Toast.makeText(getItemActivity.this, "return uri== " + getitemkey, Toast.LENGTH_LONG).show();
+
     }
 
 
@@ -349,7 +347,7 @@ public class getItemActivity extends AppCompatActivity
             } else {
                 //img를 받기 위한 Uri
                 Uri image = data.getData();
-
+                Log.i(image.toString(), "select image////"+image.toString());
                 try {
                     //사진을 비트맵이미지로 변환
                     bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), image);
