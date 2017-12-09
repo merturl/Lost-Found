@@ -141,8 +141,15 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, locreq, this);
 
             mGeofenceList = new ArrayList<Geofence>();
+            // 내 반경 100m 이내 100개 추리기
+
             for(Map.Entry<String, LatLng> entry : Constants.zones.entrySet()) {
-                mGeofenceList.add(new Geofence.Builder().setRequestId(entry.getKey()).setCircularRegion(entry.getValue().latitude, entry.getValue().longitude, 5000).setExpirationDuration(360000).setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT).build());
+                mGeofenceList.add(new Geofence.Builder()
+                        .setRequestId(
+                                entry.getKey()).setCircularRegion(entry.getValue().latitude,    // key
+                                entry.getValue().longitude, 5000).setExpirationDuration(360000)
+                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                        .build());  // value
 
                 Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
                 PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);

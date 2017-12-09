@@ -1,6 +1,7 @@
 package com.example.jongho.newproject_1;
 
 import android.Manifest;
+import android.app.LoaderManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -52,9 +53,15 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 
 //MainAcritivity
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener {
@@ -84,6 +91,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Marker currentMarker;
     Marker addMarker;
 
+    List<Zone> zonelist = new ArrayList<>();
+    protected ArrayList<Geofence> mGeofenceList;
+
     Circle mapCircle;
 
     PendingIntent pendingIntent = null;
@@ -100,6 +110,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.i("plz", "oncreate");
+
+        display();
 
         //fuseLocationClient init
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -109,9 +122,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         checkForLocationRequest();
         checkForLocationSettings();
 
+
         //Init googleMap
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
     }
 
     @Override
@@ -132,6 +148,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onStart() {
         super.onStart();
         callCurrentLocation();
+
     }
 
     public void callLastKnownLocation() {
@@ -177,39 +194,40 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 //Permissions request to user
                 requestPermissions(REQUEST_PERMISSIONS_CURRENT_LOCATION_REQUEST_CODE);
                 return;
-            }
-            Log.d("haha", "hshs");
-            //currentLocations update time(interval time)
-            mFusedLocationClient.requestLocationUpdates(locationRequest, new LocationCallback() {
-                @Override
-                public void onLocationResult(LocationResult locationResult) {
-                    //if currentMarker is already exist then remove marker
-                    if (currentMarker != null) {
-                        currentMarker.remove();
-                    }
-                    if(mapCircle!=null){
-                        mapCircle.remove();
-                    }
+            } else {
+                Log.d("haha", "hshs");
+                //currentLocations update time(interval time)
+                mFusedLocationClient.requestLocationUpdates(locationRequest, new LocationCallback() {
+                    @Override
+                    public void onLocationResult(LocationResult locationResult) {
+                        //if currentMarker is already exist then remove marker
+                        if (currentMarker != null) {
+                            currentMarker.remove();
+                        }
+                        if (mapCircle != null) {
+                            mapCircle.remove();
+                        }
 
-                    currentLocation = locationResult.getLastLocation();
-                    Log.d("haha", "hshs" + String.valueOf(currentLocation.getLatitude()) + String.valueOf(currentLocation.getLongitude()));
-                    LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+                        currentLocation = locationResult.getLastLocation();
+                        Log.d("haha", "hshs" + String.valueOf(currentLocation.getLatitude()) + String.valueOf(currentLocation.getLongitude()));
+                        LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
 
-                    //current location add in googleMap
+                        //current location add in googleMap
 //                    resultTextView.setText(result);
-                    MarkerOptions markerOptions = new MarkerOptions();
-                    markerOptions.position(latLng);
-                    markerOptions.title("Current Position" + latLng.latitude + "/" + latLng.longitude);
-                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-                    currentMarker = googleMap.addMarker(markerOptions);
+                        MarkerOptions markerOptions = new MarkerOptions();
+                        markerOptions.position(latLng);
+                        markerOptions.title("Current Position" + latLng.latitude + "/" + latLng.longitude);
+                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+                        currentMarker = googleMap.addMarker(markerOptions);
 
 
-                    //Marker trace to camera
-                    mapCircle = googleMap.addCircle(new CircleOptions().center(latLng).radius(CIRCLE_BOUND).strokeColor(Color.parseColor("#884169e1")).fillColor(Color.parseColor("#5587cefa")));
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                }
-            }, Looper.myLooper());
 
+                        //Marker trace to camera
+                        mapCircle = googleMap.addCircle(new CircleOptions().center(latLng).radius(CIRCLE_BOUND).strokeColor(Color.parseColor("#884169e1")).fillColor(Color.parseColor("#5587cefa")));
+                        googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                    }
+                }, Looper.myLooper());
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -218,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @SuppressWarnings("MissingPermission")
     private void getLastLocation() {
-
+        display();
         mFusedLocationClient.getLastLocation()
                 .addOnCompleteListener(this, new OnCompleteListener<Location>() {
                     @Override
@@ -421,7 +439,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         this.googleMap.setOnMapClickListener(this);
         this.googleMap.setOnMapLongClickListener(this);
 
-        display();
+
 
     }
 
@@ -445,16 +463,57 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    // 초기 데이터 수신
+    private void initdisplay() {
+        Toast.makeText(this, "initDB", Toast.LENGTH_LONG).show();
+        DatabaseReference mRef = mFireDB.getReference("getItem/"+mFirebaseAuth.getCurrentUser().getUid());
+
+        mRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Toast.makeText(MainActivity.this, "hi data", Toast.LENGTH_LONG).show();
+                Item getitem = dataSnapshot.getValue(Item.class);
+
+                // currentMarker와의 거리 구하기
+                Location locationMarker = new Location("marker");
+                Location current = new Location("current");
+
+                locationMarker.setLatitude(getitem.getLat());
+                locationMarker.setLongitude(getitem.getLng());
+                current.setLatitude(currentMarker.getPosition().latitude);
+                current.setLongitude(currentMarker.getPosition().longitude);
+
+                float distance = locationMarker.distanceTo(current);    // m 단위
+
+                Zone itemzone = new Zone();
+                itemzone.setRef("getItem/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
+                itemzone.setLatlng(new LatLng(getitem.getLat(), getitem.getLng()));
+                itemzone.setDistance(distance);
+                zonelist.add(itemzone);
+
+                for(Zone zoneitem : zonelist ) {
+                    Toast.makeText(MainActivity.this, "zoneitem Distance ==="+ zoneitem.getDistance(), Toast.LENGTH_SHORT).show();
+                }
+
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
 
     // Firebase 변화 수신
-    private void display() {
-        // Item 수신
+    private void display(@NonNull final LoaderManager.LoaderCallbacks callbacks) {
+        Log.i(TAG, "display");
+        // getItem 수신
         mFireDB.getReference("getItem/"+mFirebaseAuth.getCurrentUser().getUid())
                 .addChildEventListener(new ChildEventListener() {
-
                     // 리스트의 아이템을 검색하거나 아이템 추가가 있을 때 수신
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        // 아이템 받아오기
                         Item getitem = dataSnapshot.getValue(Item.class);
 
                         // 구글맵에 마커 추가
@@ -464,36 +523,55 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 .title(getitem.getTitle())
                                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_getitem)));
 
+                        // currentMarker와의 거리 구하기
+                        Location locationMarker = new Location("marker");
+                        Location current = new Location("current");
+
+                        locationMarker.setLatitude(getitem.getLat());
+                        locationMarker.setLongitude(getitem.getLng());
+                        current.setLatitude(currentMarker.getPosition().latitude);
+                        current.setLongitude(currentMarker.getPosition().longitude);
+
+                        float distance = locationMarker.distanceTo(current);    // m 단위
+
+                        // 마커에 달 태그
                         HashMap<String, Object> tag = new HashMap<String, Object>();
                         tag.put("DbRef", "getItem/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
                         tag.put("ImageRef", "Item/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
+                        tag.put("distance", distance);
 
                         addMarker.setTag(tag);
 
+                        Zone itemzone = new Zone();
+                        itemzone.setRef("getItem/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
+                        itemzone.setLatlng(new LatLng(getitem.getLat(), getitem.getLng()));
+                        itemzone.setDistance(distance);
+                        zonelist.add(itemzone);
+                        callbacks.onLoadFinished(zonelist);
+
+                        for(Zone zoneitem : zonelist ) {
+                            Toast.makeText(MainActivity.this, "zoneitem Distance ==="+ zoneitem.getDistance(), Toast.LENGTH_SHORT).show();
+                        }
+//                        Toast.makeText(MainActivity.this, "getItem/"+mFirebaseAuth.getCurrentUser().getUid(), Toast.LENGTH_SHORT).show();
+
+
+//                        Collections.sort(zonelist, new CompareDistanceAsc());
+//                        for( Zone item : zonelist ) {
+////                            Toast.makeText(MainActivity.this, item.getRef(), Toast.LENGTH_SHORT).show();
+//                        }
                     }
 
                     // 아이템 변화가 있을 때 수신
                     @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
                     // 아이템이 삭제 되었을 때 수신
                     @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                    }
-
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {}
                     // 순서가 있는 리스트에서 순서가 변경 되었을 때 수신
                     @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
                     @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
+                    public void onCancelled(DatabaseError databaseError) {}
                 });
 
         // lostItem 수신
@@ -511,14 +589,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 .title(getitem.getTitle())
                                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_lostitem)));
 
+                        // currentMarker와의 거리 구하기
+                        Location locationMarker = new Location("marker");
+                        Location current = new Location("current");
+
+                        locationMarker.setLatitude(getitem.getLat());
+                        locationMarker.setLongitude(getitem.getLng());
+                        current.setLatitude(currentMarker.getPosition().latitude);
+                        current.setLongitude(currentMarker.getPosition().longitude);
+
+                        float distance = locationMarker.distanceTo(current);    // m 단위
+                        Toast.makeText(MainActivity.this, "distance="+ distance , Toast.LENGTH_SHORT).show();
                         HashMap<String, Object> tag = new HashMap<String, Object>();
                         tag.put("DbRef", "lostItem/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
                         tag.put("ImageRef", "Item/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
-
+                        tag.put("distance", distance);
                         addMarker.setTag(tag);
+
+
                     }
-
-
 
                     // 아이템 변화가 있을 때 수신
                     @Override
@@ -560,16 +649,53 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private Geofence getGeofence(){
         //지오 펜스 생성
-        Geofence geofence = new Geofence.Builder().setRequestId("User").setCircularRegion(lastLocation.getLatitude(), lastLocation.getLongitude(), CIRCLE_BOUND).setExpirationDuration(360000)
-                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT).build();
+        Geofence geofence = new Geofence.Builder()
+                .setRequestId("User")
+                .setCircularRegion(lastLocation.getLatitude(), lastLocation.getLongitude(), CIRCLE_BOUND)
+                .setExpirationDuration(360000)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT).build();    // 지오펜스 발생 시점
+        Toast.makeText(this, "region"+ lastLocation.getLatitude(), Toast.LENGTH_SHORT).show();
+//        display();
+
         return geofence;
     }
 
+    // GooglePlayService에 지오 펜스 요청
     private GeofencingRequest getGeofencingRequest() {
-        //Geofencing Return
+
+
+        mGeofenceList = new ArrayList<Geofence>();
+        // 100m 이내 마커들
+//        Toast.makeText(this, zonelist, Toast.LENGTH_SHORT).show();
+
+        for( Zone item : zonelist ) {
+            Toast.makeText(this,"zoneitem======="+ item.getLatlng().longitude, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"zoneitem======="+ item.getDistance(), Toast.LENGTH_SHORT).show();
+
+//                mGeofenceList.add(new Geofence.Builder()
+//                        .setRequestId(item.getRef())
+//                        .setCircularRegion(
+//                                item.getLatlng().latitude,
+//                                item.getLatlng().longitude,
+//                                CIRCLE_BOUND
+//                        )
+//                        .setExpirationDuration(360000)
+//                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+//                        .build());
+        }
+
+
+        mGeofenceList.add(new Geofence.Builder()
+                .setRequestId("User")
+                .setCircularRegion(lastLocation.getLatitude(), lastLocation.getLongitude(), CIRCLE_BOUND)
+                .setExpirationDuration(360000)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT).build());    // 지오펜스 발생 시점
+
+//        Geofencing ReturnCollections.sort(zonelist, new CompareDistanceAsc());
         GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
         builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_DWELL);
-        builder.addGeofence(getGeofence());
+//        builder.addGeofence(getGeofence());
+        builder.addGeofences(mGeofenceList);
         return builder.build();
     }
 
@@ -584,6 +710,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.
                 FLAG_UPDATE_CURRENT);
         return pendingIntent;
+    }
+
+    // distance로 오름차순 정렬
+    static class CompareDistanceAsc implements Comparator<Zone> {
+        @Override
+        public int compare(Zone z1, Zone z2) {
+            return z1.getDistance() < z2.getDistance() ? -1 : z1.getDistance() > z2.getDistance() ? 1:0 ;
+        }
     }
 }
 

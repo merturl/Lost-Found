@@ -9,6 +9,10 @@ import java.util.HashMap;
  */
 
 public final class Constants {
+    public static HashMap<String, LatLng> getZones() {
+        return zones;
+    }
+
     public static final HashMap<String, LatLng> zones = new HashMap<String, LatLng>();
     static {
         zones.put("Mju Univ", new LatLng(37.222206, 127.1875443));
