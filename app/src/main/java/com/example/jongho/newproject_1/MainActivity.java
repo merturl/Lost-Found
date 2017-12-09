@@ -414,7 +414,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     // 내가 생성한 마커면 수정, 아니면 읽기만 가능
                     if(tag.get("Uid") == mFirebaseAuth.getCurrentUser().getUid()){
-                        Intent SetItemView = new Intent(MainActivity.this, SetItemViewActivity.class);
+                        Intent SetItemView = new Intent(MainActivity.this, ItemViewActivity.class);
                         SetItemView.putExtra("DbRef", tag.get("DbRef").toString());
                         SetItemView.putExtra("ImageRef", tag.get("ImageRef").toString());
                         startActivity(SetItemView);

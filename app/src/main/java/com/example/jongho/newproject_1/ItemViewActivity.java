@@ -20,6 +20,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageException;
 import com.google.firebase.storage.StorageReference;
 
 public class ItemViewActivity extends AppCompatActivity {
@@ -55,7 +56,8 @@ public class ItemViewActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 mStorageRef = FirebaseStorage.getInstance().getReference();
                 StorageReference storageReference = mStorageRef.child(ImageRef+ ".jpg");
-//                mStorageRef.child("Item/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey() +".jpg");
+
+                Toast.makeText(ItemViewActivity.this, "storageReference===="+storageReference, Toast.LENGTH_LONG).show();
                 Item item = dataSnapshot.getValue(Item.class);
 
                 TextView title = (TextView)findViewById(R.id.text_ItemTitle);
@@ -69,10 +71,16 @@ public class ItemViewActivity extends AppCompatActivity {
                 content.setText(item.getContent());
                 time.setText(item.getTime());
                 // Load the image using Glide
-                Glide.with(ItemViewActivity.this)
-                        .using(new FirebaseImageLoader())
-                        .load(storageReference)
-                        .into(imgView);
+                try{
+                    Glide.with(ItemViewActivity.this)
+                            .using(new FirebaseImageLoader())
+                            throw new Exception("don")
+                            .load(storageReference)
+                            .into(imgView);
+                } catch ( Exception e) {
+
+                }
+
 
             }
 
