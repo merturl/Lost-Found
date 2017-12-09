@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -20,6 +21,9 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 public class AuthActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
@@ -82,6 +86,10 @@ public class AuthActivity extends AppCompatActivity implements GoogleApiClient.O
             public void onSuccess(AuthResult authResult) {
 //                FirebaseUser firebaseUser = authResult.getUser();
 //                Toast.makeText(AuthActivity.this, firebaseUser.getEmail(), Toast.LENGTH_LONG).show();
+//                Log.d("haha",  FirebaseInstanceId.getInstance().getToken());
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference("tokens");
+                reference.child(authResult.getUser().getUid()).setValue(FirebaseInstanceId.getInstance().getToken());
+                Log.d("haha", FirebaseInstanceId.getInstance().getToken());
                 startActivity(new Intent(AuthActivity.this, MainActivity.class));
                 finish();
             }

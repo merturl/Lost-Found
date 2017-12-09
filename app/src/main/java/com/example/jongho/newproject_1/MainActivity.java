@@ -2,6 +2,9 @@ package com.example.jongho.newproject_1;
 
 import android.Manifest;
 import android.app.LoaderManager;
+import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -9,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -97,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Circle mapCircle;
 
     PendingIntent pendingIntent = null;
-    
+
     // Firebase 객체 생성
     private FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase mFireDB = FirebaseDatabase.getInstance();
@@ -126,8 +130,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Init googleMap
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-
     }
 
     @Override
@@ -505,7 +507,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     // Firebase 변화 수신
-    private void display(@NonNull final LoaderManager.LoaderCallbacks callbacks) {
+    private void display() {
         Log.i(TAG, "display");
         // getItem 수신
         mFireDB.getReference("getItem/"+mFirebaseAuth.getCurrentUser().getUid())
