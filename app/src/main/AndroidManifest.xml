@@ -60,19 +60,14 @@
 
         <activity android:name=".AuthActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
         </activity>
         <activity
-            android:name=".MapsActivity"
+            android:name=".MainActivity"
             android:label="@string/title_activity_maps">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".getItemActivity"
@@ -83,7 +78,6 @@
             android:name=".GeofenceTransitionsIntentService"
             android:exported="false" />
 
-        <activity android:name=".MainActivity" />
         <activity android:name=".TypeActivity" />
         <activity
             android:name=".LostItemActivity"
