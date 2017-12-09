@@ -1,10 +1,6 @@
 package com.example.jongho.newproject_1;
 
 import android.Manifest;
-import android.app.LoaderManager;
-import android.annotation.SuppressLint;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -12,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -116,11 +111,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
         Log.i("plz", "oncreate");
 
-        display();
+
 
         //fuseLocationClient init
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         geofencingClient = LocationServices.getGeofencingClient(this);
+        mGeofenceList = new ArrayList<Geofence>();
 
         //checkforlocation
         checkForLocationRequest();
@@ -223,7 +219,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         currentMarker = googleMap.addMarker(markerOptions);
 
 
-
                         //Marker trace to camera
                         mapCircle = googleMap.addCircle(new CircleOptions().center(latLng).radius(CIRCLE_BOUND).strokeColor(Color.parseColor("#884169e1")).fillColor(Color.parseColor("#5587cefa")));
                         googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -238,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @SuppressWarnings("MissingPermission")
     private void getLastLocation() {
-        display();
+
         mFusedLocationClient.getLastLocation()
                 .addOnCompleteListener(this, new OnCompleteListener<Location>() {
                     @Override
@@ -250,20 +245,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 currentMarker.remove();
                             }
 
-                            if (lastLocation != null) {
-                                Log.d("haha", "addgeofence" + lastLocation.getLongitude()+ "+" +lastLocation.getLatitude());
-                                geofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent()).addOnSuccessListener(MainActivity.this, new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Toast.makeText(MainActivity.this, "SuccessAddGeofence", Toast.LENGTH_LONG).show();
-                                    }
-                                }).addOnFailureListener(MainActivity.this, new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(MainActivity.this, "failaddGeofence", Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                            }
                             LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
 
 //                    resultTextView.setText(result);
@@ -418,7 +399,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        this.googleMap.setLatLngBoundsForCameraTarget(MJU_BOUND);
 
         // 마커 클릭 이벤트
-        try{
+        try {
             this.googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker) {
@@ -432,7 +413,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     return true;
                 }
             });
-        } catch ( NullPointerException e ) {
+        } catch (NullPointerException e) {
             // 본인 마커 찍었을 때 예외처리
             Toast.makeText(this, "Sorry, Click other point", Toast.LENGTH_SHORT).show();
         }
@@ -441,8 +422,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         this.googleMap.setOnMapClickListener(this);
         this.googleMap.setOnMapLongClickListener(this);
 
-
-
+        display();
     }
 
     @Override
@@ -456,7 +436,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         intent.putExtra("lat", point.latitude);
         intent.putExtra("lng", point.longitude);
         startActivity(intent);
-        overridePendingTransition(R.anim.anim_slide_in_right,R.anim.anim_slide_out_left);
+        overridePendingTransition(R.anim.anim_slide_in_right, R.anim.anim_slide_out_left);
 
     }
 
@@ -468,7 +448,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // 초기 데이터 수신
     private void initdisplay() {
         Toast.makeText(this, "initDB", Toast.LENGTH_LONG).show();
-        DatabaseReference mRef = mFireDB.getReference("getItem/"+mFirebaseAuth.getCurrentUser().getUid());
+        DatabaseReference mRef = mFireDB.getReference("getItem/" + mFirebaseAuth.getCurrentUser().getUid());
 
         mRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -488,16 +468,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 float distance = locationMarker.distanceTo(current);    // m 단위
 
                 Zone itemzone = new Zone();
-                itemzone.setRef("getItem/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
+                itemzone.setRef("getItem/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + dataSnapshot.getKey());
                 itemzone.setLatlng(new LatLng(getitem.getLat(), getitem.getLng()));
                 itemzone.setDistance(distance);
                 zonelist.add(itemzone);
 
-                for(Zone zoneitem : zonelist ) {
-                    Toast.makeText(MainActivity.this, "zoneitem Distance ==="+ zoneitem.getDistance(), Toast.LENGTH_SHORT).show();
+                for (Zone zoneitem : zonelist) {
+                    Toast.makeText(MainActivity.this, "zoneitem Distance ===" + zoneitem.getDistance(), Toast.LENGTH_SHORT).show();
                 }
 
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
@@ -510,7 +491,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void display() {
         Log.i(TAG, "display");
         // getItem 수신
-        mFireDB.getReference("getItem/"+mFirebaseAuth.getCurrentUser().getUid())
+        mFireDB.getReference("getItem/" + mFirebaseAuth.getCurrentUser().getUid())
                 .addChildEventListener(new ChildEventListener() {
                     // 리스트의 아이템을 검색하거나 아이템 추가가 있을 때 수신
                     @Override
@@ -520,7 +501,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         // 구글맵에 마커 추가
                         addMarker = MainActivity.this.googleMap.addMarker(new MarkerOptions()
-                                
+
                                 .position(new LatLng(getitem.getLat(), getitem.getLng()))
                                 .title(getitem.getTitle())
                                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_getitem)));
@@ -538,18 +519,47 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         // 마커에 달 태그
                         HashMap<String, Object> tag = new HashMap<String, Object>();
-                        tag.put("DbRef", "getItem/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
-                        tag.put("ImageRef", "Item/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
+                        tag.put("DbRef", "getItem/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + dataSnapshot.getKey());
+                        tag.put("ImageRef", "Item/image/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + dataSnapshot.getKey());
                         tag.put("distance", distance);
 
                         addMarker.setTag(tag);
+                        if(distance < 100) {
+                            Zone itemzone = new Zone();
+                            itemzone.setRef("getItem/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + dataSnapshot.getKey());
+                            itemzone.setLatlng(new LatLng(getitem.getLat(), getitem.getLng()));
+                            itemzone.setDistance(distance);
+                            zonelist.add(itemzone);
+                        }
 
-                        Zone itemzone = new Zone();
-                        itemzone.setRef("getItem/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
-                        itemzone.setLatlng(new LatLng(getitem.getLat(), getitem.getLng()));
-                        itemzone.setDistance(distance);
-                        zonelist.add(itemzone);
-                        callbacks.onLoadFinished(zonelist);
+                        if (lastLocation != null) {
+                            Log.d("haha", "addgeofence" + lastLocation.getLongitude() + "+" + lastLocation.getLatitude());
+                            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                // TODO: Consider calling
+                                //    ActivityCompat#requestPermissions
+                                // here to request the missing permissions, and then overriding
+                                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                //                                          int[] grantResults)
+                                // to handle the case where the user grants the permission. See the documentation
+                                // for ActivityCompat#requestPermissions for more details.
+                                requestPermissions(REQUEST_PERMISSIONS_LAST_LOCATION_REQUEST_CODE);
+                                return;
+                            }
+                            if(zonelist.size() > 0) {
+                                geofencingClient.addGeofences(getGeofencingRequest(zonelist), getGeofencePendingIntent()).addOnSuccessListener(MainActivity.this, new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(MainActivity.this, "SuccessAddGeofence", Toast.LENGTH_LONG).show();
+                                    }
+                                }).addOnFailureListener(MainActivity.this, new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(MainActivity.this, "failaddGeofence", Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                            }
+                        }
+
 
                         for(Zone zoneitem : zonelist ) {
                             Toast.makeText(MainActivity.this, "zoneitem Distance ==="+ zoneitem.getDistance(), Toast.LENGTH_SHORT).show();
@@ -601,12 +611,54 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         current.setLongitude(currentMarker.getPosition().longitude);
 
                         float distance = locationMarker.distanceTo(current);    // m 단위
-                        Toast.makeText(MainActivity.this, "distance="+ distance , Toast.LENGTH_SHORT).show();
+
+                        // 마커에 달 태그
                         HashMap<String, Object> tag = new HashMap<String, Object>();
                         tag.put("DbRef", "lostItem/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
                         tag.put("ImageRef", "Item/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
                         tag.put("distance", distance);
                         addMarker.setTag(tag);
+
+                        if(distance < 100) {
+                            Zone itemzone = new Zone();
+                            itemzone.setRef("getItem/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + dataSnapshot.getKey());
+                            itemzone.setLatlng(new LatLng(getitem.getLat(), getitem.getLng()));
+                            itemzone.setDistance(distance);
+                            zonelist.add(itemzone);
+                        }
+
+                        if (lastLocation != null) {
+                            Log.d("haha", "addgeofence" + lastLocation.getLongitude() + "+" + lastLocation.getLatitude());
+                            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                // TODO: Consider calling
+                                //    ActivityCompat#requestPermissions
+                                // here to request the missing permissions, and then overriding
+                                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                //                                          int[] grantResults)
+                                // to handle the case where the user grants the permission. See the documentation
+                                // for ActivityCompat#requestPermissions for more details.
+                                requestPermissions(REQUEST_PERMISSIONS_LAST_LOCATION_REQUEST_CODE);
+                                return;
+                            }
+                            if(zonelist.size() > 0) {
+                                geofencingClient.addGeofences(getGeofencingRequest(zonelist), getGeofencePendingIntent()).addOnSuccessListener(MainActivity.this, new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(MainActivity.this, "SuccessAddGeofence", Toast.LENGTH_LONG).show();
+                                    }
+                                }).addOnFailureListener(MainActivity.this, new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(MainActivity.this, "failaddGeofence", Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                            }
+                        }
+
+
+                        for(Zone zoneitem : zonelist ) {
+                            Toast.makeText(MainActivity.this, "zoneitem Distance ==="+ zoneitem.getDistance(), Toast.LENGTH_SHORT).show();
+                        }
 
 
                     }
@@ -648,51 +700,34 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             Toast.makeText(this, "Are you exit?", Toast.LENGTH_SHORT).show();
         }
     }
-
-    private Geofence getGeofence(){
-        //지오 펜스 생성
-        Geofence geofence = new Geofence.Builder()
-                .setRequestId("User")
-                .setCircularRegion(lastLocation.getLatitude(), lastLocation.getLongitude(), CIRCLE_BOUND)
-                .setExpirationDuration(360000)
-                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT).build();    // 지오펜스 발생 시점
-        Toast.makeText(this, "region"+ lastLocation.getLatitude(), Toast.LENGTH_SHORT).show();
-//        display();
-
-        return geofence;
-    }
+//
+//    private Geofence getGeofence(){
+//        //지오 펜스 생성
+//        Geofence geofence = new Geofence.Builder()
+//                .setRequestId("User")
+//                .setCircularRegion(lastLocation.getLatitude(), lastLocation.getLongitude(), CIRCLE_BOUND)
+//                .setExpirationDuration(Geofence.NEVER_EXPIRE)
+//                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT).build();    // 지오펜스 발생 시점
+//        Toast.makeText(this, "region"+ lastLocation.getLatitude(), Toast.LENGTH_SHORT).show();
+////        display();
+//
+//        return geofence;
+//    }
 
     // GooglePlayService에 지오 펜스 요청
-    private GeofencingRequest getGeofencingRequest() {
+    private GeofencingRequest getGeofencingRequest(List<Zone> zonelist) {
 
-
-        mGeofenceList = new ArrayList<Geofence>();
         // 100m 이내 마커들
 //        Toast.makeText(this, zonelist, Toast.LENGTH_SHORT).show();
+        Collections.sort(zonelist, new CompareDistanceAsc());
 
-        for( Zone item : zonelist ) {
-            Toast.makeText(this,"zoneitem======="+ item.getLatlng().longitude, Toast.LENGTH_SHORT).show();
-            Toast.makeText(this,"zoneitem======="+ item.getDistance(), Toast.LENGTH_SHORT).show();
-
-//                mGeofenceList.add(new Geofence.Builder()
-//                        .setRequestId(item.getRef())
-//                        .setCircularRegion(
-//                                item.getLatlng().latitude,
-//                                item.getLatlng().longitude,
-//                                CIRCLE_BOUND
-//                        )
-//                        .setExpirationDuration(360000)
-//                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-//                        .build());
+        for(Zone zone : zonelist ) {
+            mGeofenceList.add(new Geofence.Builder()
+                    .setRequestId(zone.getRef())
+                    .setCircularRegion(zone.getLatlng().latitude, zone.getLatlng().longitude, CIRCLE_BOUND)
+                    .setExpirationDuration(360000)
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT).build());    // 지오펜스 발생 시점
         }
-
-
-        mGeofenceList.add(new Geofence.Builder()
-                .setRequestId("User")
-                .setCircularRegion(lastLocation.getLatitude(), lastLocation.getLongitude(), CIRCLE_BOUND)
-                .setExpirationDuration(360000)
-                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT).build());    // 지오펜스 발생 시점
-
 //        Geofencing ReturnCollections.sort(zonelist, new CompareDistanceAsc());
         GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
         builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_DWELL);
