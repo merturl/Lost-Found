@@ -1,6 +1,7 @@
 package com.example.jongho.newproject_1;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -52,20 +53,16 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.InputMismatchException;
 import java.util.List;
 
 //MainAcritivity
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     //PerMissionCode
@@ -146,9 +143,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onStart() {
-        super.onStart();
+        Log.d("haha", "hello");
         callCurrentLocation();
 
+        super.onStart();
     }
 
     public void callLastKnownLocation() {
@@ -204,9 +202,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         if (currentMarker != null) {
                             currentMarker.remove();
                         }
-                        if (mapCircle != null) {
-                            mapCircle.remove();
-                        }
 
                         currentLocation = locationResult.getLastLocation();
                         Log.d("haha", "hshs" + String.valueOf(currentLocation.getLatitude()) + String.valueOf(currentLocation.getLongitude()));
@@ -219,10 +214,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         markerOptions.title("Current Position" + latLng.latitude + "/" + latLng.longitude);
                         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
                         currentMarker = googleMap.addMarker(markerOptions);
-
-
                         //Marker trace to camera
-                        mapCircle = googleMap.addCircle(new CircleOptions().center(latLng).radius(CIRCLE_BOUND).strokeColor(Color.parseColor("#884169e1")).fillColor(Color.parseColor("#5587cefa")));
                         googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                     }
                 }, Looper.myLooper());
@@ -230,6 +222,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        display();
     }
 
 
@@ -386,6 +379,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.d("haha", "onMpaReady");
 
         callLastKnownLocation();
+
         // 나침반이 보이게 설정
         this.googleMap.getUiSettings().setCompassEnabled(true);
         this.googleMap.getUiSettings().setZoomControlsEnabled(true);
@@ -417,9 +411,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
         this.googleMap.setOnMapClickListener(this);
-        this.googleMap.setOnMapLongClickListener(this);
-
-        display();
     }
 
     @Override
@@ -437,9 +428,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    @Override
-    public void onMapLongClick(LatLng latLng) {}
-
     // Firebase 변화 수신
     private void display() {
         Log.i(TAG, "display");
@@ -447,6 +435,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mFireDB.getReference("getItem/" + mFirebaseAuth.getCurrentUser().getUid())
                 .addChildEventListener(new ChildEventListener() {
                     // 리스트의 아이템을 검색하거나 아이템 추가가 있을 때 수신
+                    @SuppressLint("MissingPermission")
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         // 아이템 받아오기
@@ -485,19 +474,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             zonelist.add(itemzone);
                         }
 
-                        if (lastLocation != null) {
-                            Log.d("haha", "addgeofence" + lastLocation.getLongitude() + "+" + lastLocation.getLatitude());
-                            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                // TODO: Consider calling
-                                //    ActivityCompat#requestPermissions
-                                // here to request the missing permissions, and then overriding
-                                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                //                                          int[] grantResults)
-                                // to handle the case where the user grants the permission. See the documentation
-                                // for ActivityCompat#requestPermissions for more details.
-                                requestPermissions(REQUEST_PERMISSIONS_LAST_LOCATION_REQUEST_CODE);
-                                return;
-                            }
+                        if (currentLocation != null) {
+                            Log.d("haha", "addgeofence" + currentLocation.getLongitude() + "+" + currentLocation.getLatitude());
                             if(zonelist.size() > 0) {
                                 geofencingClient.addGeofences(getGeofencingRequest(zonelist), getGeofencePendingIntent()).addOnSuccessListener(MainActivity.this, new OnSuccessListener<Void>() {
                                     @Override
@@ -568,8 +546,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             zonelist.add(itemzone);
                         }
 
-                        if (lastLocation != null) {
-                            Log.d("haha", "addgeofence" + lastLocation.getLongitude() + "+" + lastLocation.getLatitude());
+                        if (currentLocation != null) {
+                            Log.d("haha", "addgeofence" + currentLocation.getLongitude() + "+" + currentLocation.getLatitude());
                             if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                                 // TODO: Consider calling
                                 //    ActivityCompat#requestPermissions
@@ -640,6 +618,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         Collections.sort(zonelist, new CompareDistanceAsc());
         for(Zone zone : zonelist ) {
+            mapCircle = googleMap.addCircle(new CircleOptions().center(new LatLng(zone.getLatlng().latitude, zone.getLatlng().longitude))
+                    .radius(CIRCLE_BOUND)
+                    .strokeColor(Color.parseColor("#884169e1"))
+                    .fillColor(Color.parseColor("#5587cefa")));
             mGeofenceList.add(new Geofence.Builder()
                     .setRequestId(zone.getRef())
                     .setCircularRegion(zone.getLatlng().latitude, zone.getLatlng().longitude, CIRCLE_BOUND)

@@ -1,15 +1,21 @@
 package com.example.jongho.newproject_1;
 
 import android.app.IntentService;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.os.Build;
+import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +28,9 @@ import java.util.List;
  * helper methods.
  */
 public class GeofenceTransitionsIntentService extends IntentService {
+    private static final String TAG = "GeofenceTransitionsIS";
+    private static final String CHANNEL_ID = "channel_01";
+
     // TODO: Rename actions, choose action names that describe tasks that this
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
     private static final String ACTION_FOO = "com.example.jongho.newproject_1.action.FOO";
@@ -78,7 +87,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
         String IDs = TextUtils.join(", ", triggeringGeofencesldsList);
 
         int transitiontype = event.getGeofenceTransition();
-
+        sendNotification(transitiontype);
         if(transitiontype == Geofence.GEOFENCE_TRANSITION_ENTER) {
             Log.e("haha", "Enter into " + IDs);
         }
@@ -88,6 +97,64 @@ public class GeofenceTransitionsIntentService extends IntentService {
         if(transitiontype == Geofence.GEOFENCE_TRANSITION_EXIT) {
             Log.e("haha", "Exit from " + IDs+event.getTriggeringLocation().getLatitude() + ""+event.getTriggeringLocation().getLongitude());
         }
+    }
+
+    private void sendNotification(int transitiontype) {
+        // Get an instance of the Notification manager
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Android O requires a Notification Channel.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.app_name);
+            // Create the channel for the notification
+            NotificationChannel mChannel =
+                    new NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT);
+
+            // Set the Notification Channel for the Notification Manager.
+            mNotificationManager.createNotificationChannel(mChannel);
+        }
+
+        // Create an explicit content Intent that starts the main Activity.
+        Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
+
+        // Construct a task stack.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+
+        // Add the main Activity to the task stack as the parent.
+        stackBuilder.addParentStack(MainActivity.class);
+
+        // Push the content Intent onto the stack.
+        stackBuilder.addNextIntent(notificationIntent);
+
+        // Get a PendingIntent containing the entire back stack.
+        PendingIntent notificationPendingIntent =
+                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // Get a notification builder that's compatible with platform versions >= 4
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+
+        // Define the notification settings.
+        builder.setSmallIcon(R.drawable.ic_stat_ic_notification)
+                // In a real app, you may want to use a library like Volley
+                // to decode the Bitmap.
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(),
+                        R.drawable.ic_stat_ic_notification))
+                .setColor(Color.RED)
+                .setContentTitle("geofence")
+                .setContentText("geofence")
+                .setContentIntent(notificationPendingIntent);
+
+        // Set the Channel ID for Android O.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            builder.setChannelId(CHANNEL_ID); // Channel ID
+        }
+
+        // Dismiss notification once the user touches it.
+        builder.setAutoCancel(true);
+
+        // Issue the notification
+        mNotificationManager.notify(0, builder.build());
     }
 
     /**
