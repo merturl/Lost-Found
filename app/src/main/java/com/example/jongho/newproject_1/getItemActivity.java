@@ -133,7 +133,7 @@ public class getItemActivity extends AppCompatActivity
         editcontent.setText("");
         edittime.setText("");
 
-        startActivity(new Intent(this, MainActivity.class));
+        finish();
         // 화면전환 애니메이션 효과
        overridePendingTransition(R.anim.anim_slide_in_left,R.anim.anim_slide_out_right);
     }

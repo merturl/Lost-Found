@@ -24,7 +24,6 @@ public class TypeActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-
     }
 
     public void moveGetItem(View view) {
@@ -32,7 +31,8 @@ public class TypeActivity extends AppCompatActivity {
         Intent intent = new Intent(this, getItemActivity.class);
         intent.putExtra("lat", lat);
         intent.putExtra("lng", lng);
-        startActivity(intent);
+        startActivityForResult(intent, 0);
+        finish();
         overridePendingTransition(R.anim.anim_slide_in_right,R.anim.anim_slide_out_left);
     }
 
@@ -42,8 +42,7 @@ public class TypeActivity extends AppCompatActivity {
         intent.putExtra("lat", lat);
         intent.putExtra("lng", lng);
         startActivity(intent);
+        finish();
         overridePendingTransition(R.anim.anim_slide_in_right,R.anim.anim_slide_out_left);
-
     }
-
 }

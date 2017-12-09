@@ -54,6 +54,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -73,8 +74,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final int CIRCLE_BOUND = 50;
     //Google location API
     private FusedLocationProviderClient mFusedLocationClient;
+    private LocationCallback locationCallback;
     //Location Request Interval
-    protected static long MIN_UPDATE_INTERVAL = 1 * 1000; // 1  minute is the minimum Android recommends, but we use 30 seconds
+    protected static long MIN_UPDATE_INTERVAL = 60 * 1000; // 1  minute is the minimum Android recommends, but we use 30 seconds
     private GeofencingClient geofencingClient;
 
     //LocationRequest
@@ -108,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Log.i("plz", "oncreate");
+        Log.i("haha", "oncreate");
 
 
         //fuseLocationClient init
@@ -119,6 +121,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //checkforlocation
         checkForLocationRequest();
         checkForLocationSettings();
+        createLocationCallBack();
 
 
         //Init googleMap
@@ -129,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onResume() {
         super.onResume();
-
+        Log.i("haha", "resume");
         //null handlering
         GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
         int result = googleApiAvailability.isGooglePlayServicesAvailable(this);
@@ -142,13 +145,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onStart() {
-        Log.d("haha", "hello");
-        callCurrentLocation();
+        Log.d("haha", "onStart");
+        callLastKnownLocation();
 
         super.onStart();
     }
 
     public void callLastKnownLocation() {
+        Log.i("haha", "callLast");
         try {
             if (
                     ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
@@ -172,7 +176,34 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    private void createLocationCallBack(){
+        locationCallback = new LocationCallback(){
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                //if currentMarker is already exist then remove marker
+                if (currentMarker != null) {
+                    currentMarker.remove();
+                }
+
+                currentLocation = locationResult.getLastLocation();
+                Log.d("haha", "hshs" + String.valueOf(currentLocation.getLatitude()) + String.valueOf(currentLocation.getLongitude()));
+                LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+
+                //current location add in googleMap
+//                    resultTextView.setText(result);
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(latLng);
+                markerOptions.title("Current Position" + latLng.latitude + "/" + latLng.longitude);
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+                currentMarker = googleMap.addMarker(markerOptions);
+                //Marker trace to camera
+                googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            }
+        };
+    }
+
     public void callCurrentLocation() {
+        Log.d("haha", "callcurrent");
         try {
             if (
                 //permission Check
@@ -192,31 +223,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 requestPermissions(REQUEST_PERMISSIONS_CURRENT_LOCATION_REQUEST_CODE);
                 return;
             } else {
-                Log.d("haha", "hshs");
                 //currentLocations update time(interval time)
-                mFusedLocationClient.requestLocationUpdates(locationRequest, new LocationCallback() {
-                    @Override
-                    public void onLocationResult(LocationResult locationResult) {
-                        //if currentMarker is already exist then remove marker
-                        if (currentMarker != null) {
-                            currentMarker.remove();
-                        }
-
-                        currentLocation = locationResult.getLastLocation();
-                        Log.d("haha", "hshs" + String.valueOf(currentLocation.getLatitude()) + String.valueOf(currentLocation.getLongitude()));
-                        LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-
-                        //current location add in googleMap
-//                    resultTextView.setText(result);
-                        MarkerOptions markerOptions = new MarkerOptions();
-                        markerOptions.position(latLng);
-                        markerOptions.title("Current Position" + latLng.latitude + "/" + latLng.longitude);
-                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-                        currentMarker = googleMap.addMarker(markerOptions);
-                        //Marker trace to camera
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                    }
-                }, Looper.myLooper());
+                mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+                display();
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -226,7 +235,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @SuppressWarnings("MissingPermission")
     private void getLastLocation() {
-        display();
         mFusedLocationClient.getLastLocation()
                 .addOnCompleteListener(this, new OnCompleteListener<Location>() {
                     @Override
@@ -252,6 +260,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     }
                 });
+        if(currentLocation == null){
+            display();
+        }
     }
 
     //Toast msg
@@ -366,6 +377,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         if (requestCode == REQUEST_PERMISSIONS_CURRENT_LOCATION_REQUEST_CODE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d("haha", "permisson");
                 callCurrentLocation();
             }
         }
@@ -376,7 +388,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         this.googleMap = googleMap;
         Log.d("haha", "onMpaReady");
 
-        callLastKnownLocation();
+        callCurrentLocation();
 
         // 나침반이 보이게 설정
         this.googleMap.getUiSettings().setCompassEnabled(true);
@@ -429,13 +441,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // Firebase 변화 수신
     private void display() {
         Log.i(TAG, "display");
+        Log.i("haha", "display");
         // getItem 수신
         mFireDB.getReference("getItem/" + mFirebaseAuth.getCurrentUser().getUid())
-                .addChildEventListener(new ChildEventListener() {
+                .addValueEventListener(new ValueEventListener() {
                     // 리스트의 아이템을 검색하거나 아이템 추가가 있을 때 수신
                     @SuppressLint("MissingPermission")
                     @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Log.d("haha", "hzasdasd");
                         // 아이템 받아오기
                         Item getitem = dataSnapshot.getValue(Item.class);
 
@@ -475,6 +489,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         if (currentLocation != null) {
                             Log.d("haha", "addgeofence" + currentLocation.getLongitude() + "+" + currentLocation.getLatitude());
                             if(zonelist.size() > 0) {
+                                Log.d("haha", "/"+zonelist.size());
                                 geofencingClient.addGeofences(getGeofencingRequest(zonelist), getGeofencePendingIntent()).addOnSuccessListener(MainActivity.this, new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
@@ -490,15 +505,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     }
 
-                    // 아이템 변화가 있을 때 수신
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
-                    // 아이템이 삭제 되었을 때 수신
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {}
-                    // 순서가 있는 리스트에서 순서가 변경 되었을 때 수신
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
                     @Override
                     public void onCancelled(DatabaseError databaseError) {}
                 });
@@ -651,6 +657,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         @Override
         public int compare(Zone z1, Zone z2) {
             return z1.getDistance() < z2.getDistance() ? -1 : z1.getDistance() > z2.getDistance() ? 1:0 ;
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(mFusedLocationClient != null){
+            mFusedLocationClient.removeLocationUpdates(locationCallback).addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    mFusedLocationClient = null;
+                }
+            });
         }
     }
 }
