@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Log.i("plz", "oncreate");
+        Log.i("haha", "oncreate");
 
 
 
@@ -254,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             markerOptions.title("Last Position");
                             markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
                             currentMarker = googleMap.addMarker(markerOptions);
-
+                            Log.d("haha","lastcurrent" + currentMarker);
                             googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                         } else {
                             showSnackbar();
@@ -402,6 +402,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         this.googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
+                Log.d("haha","asdfsf");
                 if( marker.getTag() == null ) {
                     Toast.makeText(MainActivity.this, "Sorry, pick other point", Toast.LENGTH_SHORT).show();
                     return true;
@@ -564,6 +565,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         locationMarker.setLongitude(getitem.getLng());
                         current.setLatitude(currentMarker.getPosition().latitude);
                         current.setLongitude(currentMarker.getPosition().longitude);
+                        Log.d("haha", String.valueOf(currentMarker.getPosition().latitude));
 
                         float distance = locationMarker.distanceTo(current);    // m 단위
 
