@@ -56,10 +56,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.InputMismatchException;
 import java.util.List;
 
 //MainAcritivity
@@ -247,7 +249,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                             LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
 
-//                    resultTextView.setText(result);
                             MarkerOptions markerOptions = new MarkerOptions();
                             markerOptions.position(latLng);
                             markerOptions.title("Last Position");
@@ -396,29 +397,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         this.googleMap.animateCamera(CameraUpdateFactory.zoomOut());
         this.googleMap.setMinZoomPreference(17.0f);
         this.googleMap.setMaxZoomPreference(18.0f);
-//        this.googleMap.setLatLngBoundsForCameraTarget(MJU_BOUND);
 
         // 마커 클릭 이벤트
-        try {
-            this.googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                @Override
-                public boolean onMarkerClick(Marker marker) {
+        this.googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                if( marker.getTag() == null ) {
+                    Toast.makeText(MainActivity.this, "Sorry, pick other point", Toast.LENGTH_SHORT).show();
+                    return true;
+                } else {
                     HashMap<String, Object> tag;
                     tag = (HashMap) marker.getTag();
-//                Toast.makeText(MainActivity.this, tag.get("ImageRef").toString() , Toast.LENGTH_LONG).show();
                     Intent ItemView = new Intent(MainActivity.this, ItemViewActivity.class);
                     ItemView.putExtra("DbRef", tag.get("DbRef").toString());
                     ItemView.putExtra("ImageRef", tag.get("ImageRef").toString());
                     startActivity(ItemView);
                     return true;
                 }
-            });
-        } catch (NullPointerException e) {
-            // 본인 마커 찍었을 때 예외처리
-            Toast.makeText(this, "Sorry, Click other point", Toast.LENGTH_SHORT).show();
-        }
-
-
+            }
+        });
         this.googleMap.setOnMapClickListener(this);
         this.googleMap.setOnMapLongClickListener(this);
 
@@ -441,51 +438,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    public void onMapLongClick(LatLng latLng) {
-
-    }
-
-    // 초기 데이터 수신
-    private void initdisplay() {
-        Toast.makeText(this, "initDB", Toast.LENGTH_LONG).show();
-        DatabaseReference mRef = mFireDB.getReference("getItem/" + mFirebaseAuth.getCurrentUser().getUid());
-
-        mRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Toast.makeText(MainActivity.this, "hi data", Toast.LENGTH_LONG).show();
-                Item getitem = dataSnapshot.getValue(Item.class);
-
-                // currentMarker와의 거리 구하기
-                Location locationMarker = new Location("marker");
-                Location current = new Location("current");
-
-                locationMarker.setLatitude(getitem.getLat());
-                locationMarker.setLongitude(getitem.getLng());
-                current.setLatitude(currentMarker.getPosition().latitude);
-                current.setLongitude(currentMarker.getPosition().longitude);
-
-                float distance = locationMarker.distanceTo(current);    // m 단위
-
-                Zone itemzone = new Zone();
-                itemzone.setRef("getItem/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + dataSnapshot.getKey());
-                itemzone.setLatlng(new LatLng(getitem.getLat(), getitem.getLng()));
-                itemzone.setDistance(distance);
-                zonelist.add(itemzone);
-
-                for (Zone zoneitem : zonelist) {
-                    Toast.makeText(MainActivity.this, "zoneitem Distance ===" + zoneitem.getDistance(), Toast.LENGTH_SHORT).show();
-                }
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
+    public void onMapLongClick(LatLng latLng) {}
 
     // Firebase 변화 수신
     private void display() {
@@ -559,18 +512,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 });
                             }
                         }
-
-
-                        for(Zone zoneitem : zonelist ) {
-                            Toast.makeText(MainActivity.this, "zoneitem Distance ==="+ zoneitem.getDistance(), Toast.LENGTH_SHORT).show();
-                        }
-//                        Toast.makeText(MainActivity.this, "getItem/"+mFirebaseAuth.getCurrentUser().getUid(), Toast.LENGTH_SHORT).show();
-
-
-//                        Collections.sort(zonelist, new CompareDistanceAsc());
-//                        for( Zone item : zonelist ) {
-////                            Toast.makeText(MainActivity.this, item.getRef(), Toast.LENGTH_SHORT).show();
-//                        }
                     }
 
                     // 아이템 변화가 있을 때 수신
@@ -654,13 +595,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 });
                             }
                         }
-
-
-                        for(Zone zoneitem : zonelist ) {
-                            Toast.makeText(MainActivity.this, "zoneitem Distance ==="+ zoneitem.getDistance(), Toast.LENGTH_SHORT).show();
-                        }
-
-
                     }
 
                     // 아이템 변화가 있을 때 수신
@@ -700,27 +634,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             Toast.makeText(this, "Are you exit?", Toast.LENGTH_SHORT).show();
         }
     }
-//
-//    private Geofence getGeofence(){
-//        //지오 펜스 생성
-//        Geofence geofence = new Geofence.Builder()
-//                .setRequestId("User")
-//                .setCircularRegion(lastLocation.getLatitude(), lastLocation.getLongitude(), CIRCLE_BOUND)
-//                .setExpirationDuration(Geofence.NEVER_EXPIRE)
-//                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT).build();    // 지오펜스 발생 시점
-//        Toast.makeText(this, "region"+ lastLocation.getLatitude(), Toast.LENGTH_SHORT).show();
-////        display();
-//
-//        return geofence;
-//    }
 
     // GooglePlayService에 지오 펜스 요청
     private GeofencingRequest getGeofencingRequest(List<Zone> zonelist) {
 
-        // 100m 이내 마커들
-//        Toast.makeText(this, zonelist, Toast.LENGTH_SHORT).show();
         Collections.sort(zonelist, new CompareDistanceAsc());
-
         for(Zone zone : zonelist ) {
             mGeofenceList.add(new Geofence.Builder()
                     .setRequestId(zone.getRef())
@@ -728,10 +646,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     .setExpirationDuration(360000)
                     .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT).build());    // 지오펜스 발생 시점
         }
-//        Geofencing ReturnCollections.sort(zonelist, new CompareDistanceAsc());
+
         GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
         builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_DWELL);
-//        builder.addGeofence(getGeofence());
         builder.addGeofences(mGeofenceList);
         return builder.build();
     }
