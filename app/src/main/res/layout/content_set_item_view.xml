@@ -5,11 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.jongho.newproject_1.ItemViewActivity"
-    tools:showIn="@layout/activity_item_view">
+    tools:context="com.example.jongho.newproject_1.SetItemViewActivity"
+    tools:showIn="@layout/activity_set_item_view">
 
     <ImageView
-        android:id="@+id/imgv_item"
+        android:id="@+id/imgv_setitem"
         android:layout_width="388dp"
         android:layout_height="191dp"
         android:layout_marginBottom="320dp"
@@ -31,22 +31,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imgv_item">
 
-        <TextView
-            android:id="@+id/text_ItemTitle"
+        <EditText
+            android:id="@+id/edit_ItemTitle"
             android:layout_width="match_parent"
             android:layout_height="37dp"
-            android:text="TextView" />
+            />
 
-        <TextView
-            android:id="@+id/text_ItemTime"
+        <EditText
+            android:id="@+id/edit_ItemTime"
             android:layout_width="match_parent"
             android:layout_height="33dp"
-            android:text="TextView" />
+             />
 
-        <TextView
-            android:id="@+id/text_ItemContent"
+        <EditText
+            android:id="@+id/edit_ItemContent"
             android:layout_width="match_parent"
             android:layout_height="180dp"
-            android:text="TextView" />
+             />
     </LinearLayout>
+
 </android.support.constraint.ConstraintLayout>

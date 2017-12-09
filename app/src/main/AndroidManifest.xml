@@ -60,15 +60,14 @@
 
         <activity android:name=".AuthActivity">
             <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN" />
 
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".MainActivity"
-            android:label="@string/title_activity_maps">
-        </activity>
+            android:label="@string/title_activity_maps"></activity>
         <activity
             android:name=".getItemActivity"
             android:label="@string/title_activity_get_item"
@@ -86,6 +85,10 @@
         <activity
             android:name=".ItemViewActivity"
             android:label="@string/title_activity_item_view"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".SetItemViewActivity"
+            android:label="@string/title_activity_set_item_view"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

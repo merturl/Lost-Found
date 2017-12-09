@@ -408,11 +408,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 } else {
                     HashMap<String, Object> tag;
                     tag = (HashMap) marker.getTag();
-                    Intent ItemView = new Intent(MainActivity.this, ItemViewActivity.class);
-                    ItemView.putExtra("DbRef", tag.get("DbRef").toString());
-                    ItemView.putExtra("ImageRef", tag.get("ImageRef").toString());
-                    startActivity(ItemView);
-                    return true;
+
+                    Toast.makeText(MainActivity.this, "tag uid="+tag.get("Uid"), Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, "my uid="+mFirebaseAuth.getCurrentUser().getUid(), Toast.LENGTH_LONG).show();
+
+                    // 내가 생성한 마커면 수정, 아니면 읽기만 가능
+                    if(tag.get("Uid") == mFirebaseAuth.getCurrentUser().getUid()){
+                        Intent SetItemView = new Intent(MainActivity.this, SetItemViewActivity.class);
+                        SetItemView.putExtra("DbRef", tag.get("DbRef").toString());
+                        SetItemView.putExtra("ImageRef", tag.get("ImageRef").toString());
+                        startActivity(SetItemView);
+                        return true;
+                    } else {
+                        Intent ItemView = new Intent(MainActivity.this, ItemViewActivity.class);
+                        ItemView.putExtra("DbRef", tag.get("DbRef").toString());
+                        ItemView.putExtra("ImageRef", tag.get("ImageRef").toString());
+                        startActivity(ItemView);
+                        return true;
+                    }
                 }
             }
         });
@@ -474,6 +487,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         HashMap<String, Object> tag = new HashMap<String, Object>();
                         tag.put("DbRef", "getItem/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + dataSnapshot.getKey());
                         tag.put("ImageRef", "Item/image/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + dataSnapshot.getKey());
+                        tag.put("Uid",mFirebaseAuth.getCurrentUser().getUid());
                         tag.put("distance", distance);
 
                         addMarker.setTag(tag);
@@ -502,7 +516,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 geofencingClient.addGeofences(getGeofencingRequest(zonelist), getGeofencePendingIntent()).addOnSuccessListener(MainActivity.this, new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
-                                        Toast.makeText(MainActivity.this, "SuccessAddGeofence", Toast.LENGTH_LONG).show();
+//                                        Toast.makeText(MainActivity.this, "SuccessAddGeofence", Toast.LENGTH_LONG).show();
                                     }
                                 }).addOnFailureListener(MainActivity.this, new OnFailureListener() {
                                     @Override
