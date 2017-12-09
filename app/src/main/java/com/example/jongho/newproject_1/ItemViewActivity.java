@@ -56,7 +56,6 @@ public class ItemViewActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 mStorageRef = FirebaseStorage.getInstance().getReference();
                 StorageReference storageReference = mStorageRef.child(ImageRef+ ".jpg");
-//                mStorageRef.child("Item/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey() +".jpg");
                 Item item = dataSnapshot.getValue(Item.class);
 
                 TextView title = (TextView)findViewById(R.id.text_ItemTitle);
@@ -73,9 +72,7 @@ public class ItemViewActivity extends AppCompatActivity {
                         .using(new FirebaseImageLoader())
                         .load(storageReference)
                         .into(imgView);
-
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // ...
