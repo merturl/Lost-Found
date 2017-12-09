@@ -111,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.i("plz", "oncreate");
 
 
-
         //fuseLocationClient init
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         geofencingClient = LocationServices.getGeofencingClient(this);
@@ -222,13 +221,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        display();
     }
 
 
     @SuppressWarnings("MissingPermission")
     private void getLastLocation() {
-
+        display();
         mFusedLocationClient.getLastLocation()
                 .addOnCompleteListener(this, new OnCompleteListener<Location>() {
                     @Override
