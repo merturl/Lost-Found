@@ -1,7 +1,6 @@
 package com.example.jongho.newproject_1;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -54,7 +53,6 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -507,6 +505,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 itemzone.setLatlng(new LatLng(item.getLat(), item.getLng()));
                                 itemzone.setDistance(distance);
                                 zonelist.add(itemzone);
+
+                        if (currentLocation != null || lastLocation != null) {
+                            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                // TODO: Consider calling
+                                //    ActivityCompat#requestPermissions
+                                // here to request the missing permissions, and then overriding
+                                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                //                                          int[] grantResults)
+                                // to handle the case where the user grants the permission. See the documentation
+                                // for ActivityCompat#requestPermissions for more details.
+                                requestPermissions(REQUEST_PERMISSIONS_LAST_LOCATION_REQUEST_CODE);
+                                return;
                             }
 
                             if (currentLocation != null) {
