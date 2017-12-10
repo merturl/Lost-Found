@@ -94,16 +94,9 @@ public class getItemActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.i("onDestroy","onDestroy");
-    }
-
     // DB에 아이템 저장
     public void saveGetItem(View v) {
         Intent getIntent = getIntent();
-
 
         // 입력창
         EditText edittitle = (EditText)findViewById(R.id.edit_Gettitle);
@@ -142,6 +135,8 @@ public class getItemActivity extends AppCompatActivity
         // 화면전환 애니메이션 효과
        overridePendingTransition(R.anim.anim_slide_in_left,R.anim.anim_slide_out_right);
     }
+
+
 
 
     @Override
@@ -364,4 +359,5 @@ public class getItemActivity extends AppCompatActivity
         }
 
     }
+
 }
