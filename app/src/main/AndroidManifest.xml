@@ -91,7 +91,6 @@
             android:name=".SetItemViewActivity"
             android:label="@string/title_activity_set_item_view"
             android:theme="@style/AppTheme.NoActionBar"></activity>
-
         <activity android:name=".ContractsActivity"/>
     </application>
 
