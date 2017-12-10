@@ -2,11 +2,16 @@ package com.example.jongho.newproject_1;
 
 import android.Manifest;
 import android.app.PendingIntent;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
@@ -16,6 +21,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -54,6 +61,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -68,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final int REQUEST_PERMISSIONS_LOCATION_SETTINGS_REQUEST_CODE = 33;
     private static final int REQUEST_PERMISSIONS_LAST_LOCATION_REQUEST_CODE = 34;
     private static final int REQUEST_PERMISSIONS_CURRENT_LOCATION_REQUEST_CODE = 35;
-    private static final int REQUEST_PERMISSIONS_GEOFENCE_REQUEST_CODE = 36;
+    private static final int REQUEST_PERMISSIONS_MYLOCATION_CODE = 36;
     private static final int CIRCLE_BOUND = 50;
     //Google location API
     private FusedLocationProviderClient mFusedLocationClient;
@@ -88,6 +96,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Marker
     Marker currentMarker;
     Marker addMarker;
+
+    private EditText addr;
+
+    private SQLiteDatabase mDB;
+    private Cursor mCursor;
+    private ContentValues v = new ContentValues();
 
     List<Zone> zonelist = new ArrayList<>();
     protected ArrayList<Geofence> mGeofenceList;
@@ -110,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
         Log.i("haha", "oncreate");
 
+        //init SearchAddress data record
         //fuseLocationClient init
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         geofencingClient = LocationServices.getGeofencingClient(this);
@@ -120,10 +135,64 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         checkForLocationSettings();
         createLocationCallBack();
 
+        initDB();
+
 
         //Init googleMap
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+    }
+
+    public void initDB() {
+        addr = (EditText) findViewById(R.id.addr);
+        Button tran = (Button) findViewById(R.id.tran);
+
+        // DB를 위한 부분
+        FeedReaderDbHelper mHendler = new FeedReaderDbHelper(this);
+        mDB = mHendler.getWritableDatabase();
+        mHendler.onCreate(mDB);
+
+        final Geocoder geo = new Geocoder(this);
+
+        tran.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                List<Address> list = null;
+                String str = addr.getText().toString();
+
+                //Stop My currentLocation when users search location to use Address
+                if (mFusedLocationClient != null) {
+                    mFusedLocationClient.removeLocationUpdates(locationCallback).addOnCompleteListener(MainActivity.this, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            mFusedLocationClient = null;
+                        }
+                    });
+                }
+
+                try {
+                    list = geo.getFromLocationName(str, 10);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.e("HAHA", "서버에서 주소 못찾음");
+                }
+
+                if (list != null) {
+                    if (list.size() == 0) {
+                        Toast.makeText(MainActivity.this, "해당 주소정보 없음", Toast.LENGTH_SHORT).show();
+                    } else {
+
+                        Toast.makeText(MainActivity.this, String.valueOf(list.get(0).getLatitude()) + ", " + String.valueOf(list.get(0).getLongitude()), Toast.LENGTH_LONG).show();
+                        googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(list.get(0).getLatitude(), list.get(0).getLongitude())));
+                        v.put("addr", addr.getText().toString());
+                        v.put("lat", list.get(0).getLatitude());
+                        v.put("lon", list.get(0).getLongitude());
+                        mDB.insert("my_Geo", null, v);
+                        loadSearchRecord();
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -140,11 +209,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    private void loadSearchRecord(){
+        mCursor = mDB.query("my_Geo", new String[]{"addr", "lat", "lon"}, null, null, null, null, "_id");
+        if (mCursor != null) {
+            if (mCursor.moveToFirst()) {
+                do {
+                    Log.e("HAHA", mCursor.getString(0) + ", " + mCursor.getString(1) + ", " + mCursor.getString(2));
+                } while (mCursor.moveToNext());
+            }
+        }
+    }
+
     @Override
     public void onStart() {
         Log.d("haha", "onStart");
-        callLastKnownLocation();
 
+        callLastKnownLocation();
         super.onStart();
     }
 
@@ -173,8 +253,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private void createLocationCallBack(){
-        locationCallback = new LocationCallback(){
+    private void createLocationCallBack() {
+        locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 //if currentMarker is already exist then remove marker
@@ -250,14 +330,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             markerOptions.title("Last Position");
                             markerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_redmarker));
                             currentMarker = googleMap.addMarker(markerOptions);
-                            Log.d("haha","lastcurrent" + currentMarker);
+                            Log.d("haha", "lastcurrent" + currentMarker);
                             googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                         } else {
                             showSnackbar();
                         }
                     }
                 });
-        if(currentLocation == null){
+        if (currentLocation == null) {
             display();
         }
     }
@@ -393,11 +473,33 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         this.googleMap.getUiSettings().setIndoorLevelPickerEnabled(true);
         this.googleMap.getUiSettings().setMapToolbarEnabled(true);
 
+
         // Camera
         this.googleMap.animateCamera(CameraUpdateFactory.zoomIn());
         this.googleMap.animateCamera(CameraUpdateFactory.zoomOut());
         this.googleMap.setMinZoomPreference(17.0f);
         this.googleMap.setMaxZoomPreference(18.0f);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            startLocationPermissionRequest(REQUEST_PERMISSIONS_MYLOCATION_CODE);
+            return;
+        }
+        this.googleMap.setMyLocationEnabled(true);
+        this.googleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+            @Override
+            public boolean onMyLocationButtonClick() {
+                if(mFusedLocationClient == null)
+                    createLocationCallBack();
+                return false;
+            }
+        });
 
         // 마커 클릭 이벤트
         this.googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
