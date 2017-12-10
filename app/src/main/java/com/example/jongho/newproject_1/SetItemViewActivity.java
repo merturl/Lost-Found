@@ -6,6 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -46,9 +47,9 @@ public class SetItemViewActivity extends AppCompatActivity {
 
         Intent getintent = getIntent();
         String DbRef = getintent.getStringExtra("DbRef");
+        Log.d("DB", "DbRef===" + DbRef);
         final String ImageRef = getintent.getStringExtra("ImageRef");
-        Toast.makeText(this, "imageRef= "+ ImageRef, Toast.LENGTH_SHORT).show();
-        Toast.makeText(this, "DbRef= "+ DbRef, Toast.LENGTH_SHORT).show();
+        Log.d("DB", "ImageRef===" + ImageRef);
 
         mFireDB.getReference(DbRef)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -57,22 +58,24 @@ public class SetItemViewActivity extends AppCompatActivity {
                         mStorageRef = FirebaseStorage.getInstance().getReference();
                         StorageReference storageReference = mStorageRef.child(ImageRef+ ".jpg");
 //                mStorageRef.child("Item/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey() +".jpg");
+
                         Item item = dataSnapshot.getValue(Item.class);
 
-                        EditText title = (EditText) findViewById(R.id.edit_title);
-                        EditText content = (EditText) findViewById(R.id.edit_content);
-                        EditText time = (EditText) findViewById(R.id.edit_time);
+                        EditText title = (EditText) findViewById(R.id.edit_ItemTitle);
+                        EditText content = (EditText) findViewById(R.id.edit_ItemContent);
+                        EditText time = (EditText) findViewById(R.id.edit_ItemTime);
                         ImageView imgView = (ImageView)findViewById(R.id.imgv_setitem);
 
                         Toast.makeText(SetItemViewActivity.this, "title"+ item.getTitle(), Toast.LENGTH_SHORT).show();
                         Toast.makeText(SetItemViewActivity.this, "content"+ item.getContent(), Toast.LENGTH_SHORT).show();
                         Toast.makeText(SetItemViewActivity.this, "time"+ item.getTime(), Toast.LENGTH_SHORT).show();
 
-                        // text Item
-//                        title.setText(item.getTitle().toString());
-//                        content.setText(item.getContent().toString());
+                         //text Item
+                        Log.d("haha","item.getTitle() === " + item.getTitle());
+//                        title.setText(item.getTitle());
+                        content.setText(item.getContent().toString());
 //                        time.setText(item.getTime().toString());
-                        // Load the image using Glide
+//                         Load the image using Glide
 //                        Glide.with(SetItemViewActivity.this)
 //                                .using(new FirebaseImageLoader())
 //                                .load(storageReference)

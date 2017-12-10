@@ -53,7 +53,9 @@ public class ItemViewActivity extends AppCompatActivity {
             }
         });
 
+        // intent 받아오기
         Intent getintent = getIntent();
+
         String DbRef = getintent.getStringExtra("DbRef");
         final String ImageRef = getintent.getStringExtra("ImageRef");
 
@@ -66,14 +68,12 @@ public class ItemViewActivity extends AppCompatActivity {
 
                 Item item = dataSnapshot.getValue(Item.class);
 
+                Log.d("haha", "datasnapshot= "+ item.getTitle());
+
                 TextView title = (TextView)findViewById(R.id.text_ItemTitle);
                 TextView content = (TextView)findViewById(R.id.text_ItemContent);
                 TextView time = (TextView)findViewById(R.id.text_ItemTime);
 
-
-//                mStorageRef = FirebaseStorage.getInstance().getReference();
-//                StorageReference storageReference = mStorageRef.child(ImageRef+ ".jpg");
-//
                 Log.d("image","storageReference="+ storageReference);
                 Log.d("image","beforeload="+storageReference.getDownloadUrl());
 
@@ -88,12 +88,12 @@ public class ItemViewActivity extends AppCompatActivity {
                     Log.d("image",e.getMessage());
                 }
 
-
-
                 // text Item
                 title.setText(item.getTitle());
                 content.setText(item.getContent());
                 time.setText(item.getTime());
+
+
 
                 // Load the image using Glide
                 Glide.with(ItemViewActivity.this)
