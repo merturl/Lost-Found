@@ -105,7 +105,6 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".MsgActivity"></activity>
-    </application>
+        <activity android:name=".MsgActivity"></activity></application>
 
 </manifest>
