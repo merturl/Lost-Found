@@ -205,6 +205,7 @@ public class getItemActivity extends AppCompatActivity
 
         //파이어스토어 접근 레퍼런스    // Item/image/uid/randomkey.jpg
         StorageReference reference = mStorageRef.child("Item/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+getitemkey +".jpg");
+        Log.d("Image","Image== " + "Item/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+getitemkey +".jpg");
 
 
         //파이어베이스에 쓰이는 데이터로 이미지 변환

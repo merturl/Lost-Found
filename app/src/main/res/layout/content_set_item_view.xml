@@ -55,13 +55,29 @@
             android:text="time"
             tools:ignore="LabelFor" />
 
-        <Button
-            android:id="@+id/btn_edit"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:text="EDIT"
-            app:layout_constraintLeft_toLeftOf="parent" />
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_edit"
+                android:layout_width="196dp"
+                android:layout_height="wrap_content"
+                android:text="EDIT"
+                app:layout_constraintLeft_toLeftOf="parent" />
+
+            <Button
+                android:id="@+id/btn_delete"
+                android:onClick="Itemdelete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="DELETE" />
+
+        </LinearLayout>
+
+
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
