@@ -1,7 +1,6 @@
 package com.example.jongho.newproject_1;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -54,7 +53,6 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -506,8 +504,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             zonelist.add(itemzone);
                         }
 
-                        if (currentLocation != null) {
-                            Log.d("haha", "addgeofence" + currentLocation.getLongitude() + "+" + currentLocation.getLatitude());
+                        if (currentLocation != null || lastLocation != null) {
                             if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                                 // TODO: Consider calling
                                 //    ActivityCompat#requestPermissions
