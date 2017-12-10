@@ -34,23 +34,34 @@
         <EditText
             android:id="@+id/edit_ItemTitle"
             android:layout_width="match_parent"
-            android:layout_height="37dp"
+            android:layout_height="59dp"
+            android:inputType="text"
             android:text="title"
-            android:inputType="text" />
+            tools:ignore="LabelFor" />
 
         <EditText
             android:id="@+id/edit_ItemTime"
             android:layout_width="match_parent"
-            android:layout_height="33dp"
+            android:layout_height="57dp"
+            android:inputType="text"
             android:text="Content"
-            android:inputType="text" />
+            tools:ignore="LabelFor" />
 
         <EditText
             android:id="@+id/edit_ItemContent"
             android:layout_width="match_parent"
-            android:layout_height="180dp"
+            android:layout_height="138dp"
+            android:inputType="text"
             android:text="time"
-            android:inputType="text" />
+            tools:ignore="LabelFor" />
+
+        <Button
+            android:id="@+id/btn_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:text="EDIT"
+            app:layout_constraintLeft_toLeftOf="parent" />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

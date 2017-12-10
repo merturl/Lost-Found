@@ -1,19 +1,15 @@
 package com.example.jongho.newproject_1;
 
-import android.*;
 import android.Manifest;
-import android.app.ListActivity;
 import android.content.ContentResolver;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.health.PackageHealthStats;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 import java.util.ArrayList;
