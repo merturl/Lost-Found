@@ -105,7 +105,7 @@ public class getItemActivity extends AppCompatActivity
         Intent getIntent = getIntent();
 
 
-        // 입력한 정보 가져오기
+        // 입력창
         EditText edittitle = (EditText)findViewById(R.id.edit_Gettitle);
         EditText editcontent = (EditText)findViewById(R.id.edit_Getcontent);
         EditText edittime = (EditText)findViewById(R.id.edit_Gettime);
@@ -114,24 +114,29 @@ public class getItemActivity extends AppCompatActivity
         double i = 0;
         double lat = getIntent.getDoubleExtra("lat", i);
         double lng = getIntent.getDoubleExtra("lng", i);
-        String title = edittitle.getText().toString();
-        String content = editcontent.getText().toString();
-        String time = edittime.getText().toString();
+        if(edittitle.getText().toString().matches("") || editcontent.getText().toString().matches("")){
+            Toast.makeText(getItemActivity.this, "please fill Title or Contnte.", Toast.LENGTH_SHORT).show();
+            Log.d("acac","gettitle="+edittitle.getText() );
+            return;
+        } else {
+            String title = edittitle.getText().toString();
+            String content = editcontent.getText().toString();
+            String time = edittime.getText().toString();
 
+            // 아이템 저장 lat, lng,  title, content, time
+            Item saveitem = new Item(true, lat, lng, title, content);
+            DatabaseReference mFireRef = mFireDB.getReference("Item/"+mFirebaseAuth.getCurrentUser().getUid()).push();
+            mFireRef.setValue(saveitem);
+            String postId = mFireRef.getKey();
 
-        // 아이템 저장 lat, lng,  title, content, time
-        Item saveitem = new Item(true, lat, lng, title, content);
-        DatabaseReference mFireRef = mFireDB.getReference("Item/"+mFirebaseAuth.getCurrentUser().getUid()).push();
-        mFireRef.setValue(saveitem);
-        String postId = mFireRef.getKey();
+            // firestorage 에 이미지 업로드
+            if(!uploadImage(postId)) return;
 
-        // firestorage 에 이미지 업로드
-        uploadImage(postId);
-
-        // 저장 후 입력 내용 초기화
-        edittitle.setText("");
-        editcontent.setText("");
-        edittime.setText("");
+            // 저장 후 입력 내용 초기화
+            edittitle.setText("");
+            editcontent.setText("");
+            edittime.setText("");
+        }
 
         finish();
         // 화면전환 애니메이션 효과
@@ -197,9 +202,9 @@ public class getItemActivity extends AppCompatActivity
     }
 
     //파이어스토어에 이미지 저장
-    public void uploadImage(String getitemkey){
+    public boolean uploadImage(String getitemkey){
         if(getitemkey == null ) {
-            return;
+            return false;
         }
 
         //파이어스토어 접근 레퍼런스    // Item/image/uid/randomkey.jpg
@@ -210,10 +215,9 @@ public class getItemActivity extends AppCompatActivity
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-            Toast.makeText(this, "Don't image", Toast.LENGTH_SHORT).show();
-
         } catch ( NullPointerException e ) {
-            return ;
+            Toast.makeText(this, "Don't image", Toast.LENGTH_SHORT).show();
+            return false;
         }
         byte[] data = baos.toByteArray();
 
@@ -234,7 +238,7 @@ public class getItemActivity extends AppCompatActivity
             }
         });
         Toast.makeText(getItemActivity.this, "return uri== " + getitemkey, Toast.LENGTH_LONG).show();
-
+        return true;
     }
 
 

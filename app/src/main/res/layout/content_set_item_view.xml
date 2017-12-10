@@ -35,19 +35,22 @@
             android:id="@+id/edit_ItemTitle"
             android:layout_width="match_parent"
             android:layout_height="37dp"
-            />
+            android:text="title"
+            android:inputType="text" />
 
         <EditText
             android:id="@+id/edit_ItemTime"
             android:layout_width="match_parent"
             android:layout_height="33dp"
-             />
+            android:text="Content"
+            android:inputType="text" />
 
         <EditText
             android:id="@+id/edit_ItemContent"
             android:layout_width="match_parent"
             android:layout_height="180dp"
-             />
+            android:text="time"
+            android:inputType="text" />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
