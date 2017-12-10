@@ -456,24 +456,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Item 수신
         mFireDB.getReference("Item")
                 .addChildEventListener(new ChildEventListener() {
-
                     // 리스트의 아이템을 검색하거나 아이템 추가가 있을 때 수신
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) { // s 하위키, dataSnapshot 밑의 key-value
-                        for( DataSnapshot itemSnapshot : dataSnapshot.getChildren()){
+                        for (DataSnapshot itemSnapshot : dataSnapshot.getChildren()) {
 //                            Log.d("DB", "dataSnapshot.child===="+itemSnapshot.getKey());
                             String key = itemSnapshot.getKey();
                             Item item = itemSnapshot.getValue(Item.class);
 
                             // 구글맵에 마커 추가
-                            if( item.getType() == true ){
+                            if (item.getType() == true) {
                                 addMarker = MainActivity.this.googleMap.addMarker(new MarkerOptions()
 
                                         .position(new LatLng(item.getLat(), item.getLng()))
                                         .title(item.getTitle())
                                         .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_getitem)));
                             } else {
-                                addMarker= MainActivity.this.googleMap.addMarker(new MarkerOptions()
+                                addMarker = MainActivity.this.googleMap.addMarker(new MarkerOptions()
                                         .position(new LatLng(item.getLat(), item.getLng()))
                                         .title(item.getTitle())
                                         .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_lostitem)));
@@ -494,61 +493,62 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                             // 마커에 달 태그
                             HashMap<String, Object> tag = new HashMap<String, Object>();
-                            tag.put("DbRef", "lostItem/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
-                            tag.put("ImageRef", "Item/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+dataSnapshot.getKey());
+                            tag.put("DbRef", "lostItem/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + dataSnapshot.getKey());
+                            tag.put("ImageRef", "Item/image/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + dataSnapshot.getKey());
                             tag.put("distance", distance);
                             addMarker.setTag(tag);
 
-                            if(distance < 100) {
+                            if (distance < 100) {
                                 Zone itemzone = new Zone();
                                 itemzone.setRef("item/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + dataSnapshot.getKey());
                                 itemzone.setLatlng(new LatLng(item.getLat(), item.getLng()));
                                 itemzone.setDistance(distance);
                                 zonelist.add(itemzone);
 
-                        if (currentLocation != null || lastLocation != null) {
-                            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                // TODO: Consider calling
-                                //    ActivityCompat#requestPermissions
-                                // here to request the missing permissions, and then overriding
-                                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                //                                          int[] grantResults)
-                                // to handle the case where the user grants the permission. See the documentation
-                                // for ActivityCompat#requestPermissions for more details.
-                                requestPermissions(REQUEST_PERMISSIONS_LAST_LOCATION_REQUEST_CODE);
-                                return;
-                            }
+                                if (currentLocation != null || lastLocation != null) {
+                                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                        // TODO: Consider calling
+                                        //    ActivityCompat#requestPermissions
+                                        // here to request the missing permissions, and then overriding
+                                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                        //                                          int[] grantResults)
+                                        // to handle the case where the user grants the permission. See the documentation
+                                        // for ActivityCompat#requestPermissions for more details.
+                                        requestPermissions(REQUEST_PERMISSIONS_LAST_LOCATION_REQUEST_CODE);
+                                        return;
+                                    }
 
-                            if (currentLocation != null) {
-                                Log.d("haha", "addgeofence" + currentLocation.getLongitude() + "+" + currentLocation.getLatitude());
-                                if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                    // TODO: Consider calling
-                                    //    ActivityCompat#requestPermissions
-                                    // here to request the missing permissions, and then overriding
-                                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                    //                                          int[] grantResults)
-                                    // to handle the case where the user grants the permission. See the documentation
-                                    // for ActivityCompat#requestPermissions for more details.
-                                    requestPermissions(REQUEST_PERMISSIONS_LAST_LOCATION_REQUEST_CODE);
-                                    return;
-                                }
-                                if(zonelist.size() > 0) {
-                                    geofencingClient.addGeofences(getGeofencingRequest(zonelist), getGeofencePendingIntent()).addOnSuccessListener(MainActivity.this, new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Toast.makeText(MainActivity.this, "SuccessAddGeofence", Toast.LENGTH_LONG).show();
+                                    if (currentLocation != null) {
+                                        Log.d("haha", "addgeofence" + currentLocation.getLongitude() + "+" + currentLocation.getLatitude());
+                                        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                            // TODO: Consider calling
+                                            //    ActivityCompat#requestPermissions
+                                            // here to request the missing permissions, and then overriding
+                                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                            //                                          int[] grantResults)
+                                            // to handle the case where the user grants the permission. See the documentation
+                                            // for ActivityCompat#requestPermissions for more details.
+                                            requestPermissions(REQUEST_PERMISSIONS_LAST_LOCATION_REQUEST_CODE);
+                                            return;
                                         }
-                                    }).addOnFailureListener(MainActivity.this, new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Toast.makeText(MainActivity.this, "failaddGeofence", Toast.LENGTH_LONG).show();
+                                        if (zonelist.size() > 0) {
+                                            geofencingClient.addGeofences(getGeofencingRequest(zonelist), getGeofencePendingIntent()).addOnSuccessListener(MainActivity.this, new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Toast.makeText(MainActivity.this, "SuccessAddGeofence", Toast.LENGTH_LONG).show();
+                                                }
+                                            }).addOnFailureListener(MainActivity.this, new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Toast.makeText(MainActivity.this, "failaddGeofence", Toast.LENGTH_LONG).show();
+                                                }
+                                            });
                                         }
-                                    });
+                                    }
                                 }
                             }
                         }
                     }
-
                     // 아이템 변화가 있을 때 수신
                     @Override
                     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
