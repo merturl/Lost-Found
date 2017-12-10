@@ -242,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 this.addr.setText(addr);
                 if(mBound){
                     try{
-                        Toast.makeText(getApplicationContext(), mService.add(11,22)+","+ mService.sub(5,9),Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getApplicationContext(), mService.add(11,22)+","+ mService.sub(5,9),Toast.LENGTH_SHORT).show();
                         Log.i("haha", "/"+mService.add(11,22));
                     }catch (RemoteException e){
 
@@ -336,6 +336,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder iBinder) {
+            Log.d("haha", "Hello");
             mService = IMyAidlInterface.Stub.asInterface(iBinder);
             mBound = true;
         }
@@ -343,6 +344,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            Log.d("haha", "Hello1");
             mService = null;
             mBound = false;
         }
@@ -623,8 +625,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     HashMap<String, Object> tag;
                     tag = (HashMap) marker.getTag();
 
-                    Toast.makeText(MainActivity.this, "tag uid="+tag.get("Uid"), Toast.LENGTH_LONG).show();
-                    Toast.makeText(MainActivity.this, "my uid="+mFirebaseAuth.getCurrentUser().getUid(), Toast.LENGTH_LONG).show();
+//                    //테스트용 to ItemViewActivity
+//                    Intent ItemView = new Intent(MainActivity.this, ItemViewActivity.class);
+//                    ItemView.putExtra("DbRef", tag.get("DbRef").toString());
+//                    ItemView.putExtra("ImageRef", tag.get("ImageRef").toString());
+//                    ItemView.putExtra("Uid", tag.get("Uid").toString());
+//                    ItemView.putExtra("MarkerId", tag.get("MarkerId").toString());
+//                    Log.d("acac", "Uid="+tag.get("Uid").toString());
+//                    Log.d("acac", "MarkerId="+tag.get("MarkerId").toString());
+//                    startActivity(ItemView);
+//                    return true;
 
                     // 내가 생성한 마커면 수정, 아니면 읽기만 가능
                     Log.d("uid", "uid=="+tag.get("Uid"));
@@ -632,12 +642,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         Intent SetItemView = new Intent(MainActivity.this, SetItemViewActivity.class);
                         SetItemView.putExtra("DbRef", tag.get("DbRef").toString());
                         SetItemView.putExtra("ImageRef", tag.get("ImageRef").toString());
+                        SetItemView.putExtra("Uid", tag.get("Uid").toString());
+                        SetItemView.putExtra("MarkerId", tag.get("MarkerId").toString());
+                        Log.d("acac", "Uid="+tag.get("Uid").toString());
+                        Log.d("acac", "MarkerId="+tag.get("MarkerId").toString());
                         startActivity(SetItemView);
                         return true;
                     } else {
                         Intent ItemView = new Intent(MainActivity.this, ItemViewActivity.class);
                         ItemView.putExtra("DbRef", tag.get("DbRef").toString());
                         ItemView.putExtra("ImageRef", tag.get("ImageRef").toString());
+                        ItemView.putExtra("Uid", tag.get("Uid").toString());
+                        ItemView.putExtra("MarkerId", tag.get("MarkerId").toString());
+                        Log.d("acac", "Uid="+tag.get("Uid").toString());
+                        Log.d("acac", "MarkerId="+tag.get("MarkerId").toString());
                         startActivity(ItemView);
                         return true;
                     }
@@ -665,7 +683,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapClick(LatLng latLng) {
         Point clickPoint = this.googleMap.getProjection().toScreenLocation(latLng);
         LatLng point = this.googleMap.getProjection().fromScreenLocation(clickPoint);
-        Toast.makeText(this, "Click Point Lat : " + point.latitude + " Lon : " + point.longitude, Toast.LENGTH_LONG).show();
 
         // getItemActivity 전환 인텐트
         Intent intent = new Intent(this, TypeActivity.class);
@@ -721,6 +738,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             tag.put("DbRef", "Item/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + itemSnapshot.getKey());
                             tag.put("ImageRef", "Item/image/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + itemSnapshot.getKey());
                             tag.put("Uid",mFirebaseAuth.getCurrentUser().getUid());
+                            tag.put("MarkerId", itemSnapshot.getKey());
                             tag.put("distance", distance);
                             addMarker.setTag(tag);
 

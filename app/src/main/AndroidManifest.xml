@@ -101,11 +101,11 @@
             android:name=".SMSBroadcast"
             android:enabled="true"
             android:exported="true">
-
             <intent-filter android:priority="9999">
-                <action android:name="android.provider.Telephony.SMS_RECIVED"/>
+                <action android:name="android.provider.Telephony.SMS_RECIVED" />
             </intent-filter>
         </receiver>
-    </application>
+
+        <activity android:name=".MsgActivity"></activity></application>
 
 </manifest>
