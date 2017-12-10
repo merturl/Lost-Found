@@ -2,9 +2,12 @@ package com.example.jongho.newproject_1;
 
 import android.Manifest;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -14,7 +17,9 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.os.Looper;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -60,6 +65,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.jonghyeon.aidlservice.IMyAidlInterface;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -118,6 +124,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private final long FINISH_INTERVAL_TIME = 2000;
     private long backPressedTime = 0;
 
+    //AIDL service init
+    private IMyAidlInterface mService;
+    boolean mBound = false;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -159,6 +169,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View view) {
                 List<Address> list = null;
                 String str = addr.getText().toString();
+
+                if(mBound){
+                    try{
+                        Toast.makeText(getApplicationContext(), mService.add(11,22)+","+ mService.sub(5,9),Toast.LENGTH_SHORT).show();
+                        Log.i("haha", "/"+mService.add(11,22));
+                    }catch (RemoteException e){
+
+                    }
+                }
 
                 //Stop My currentLocation when users search location to use Address
                 if (mFusedLocationClient != null) {
@@ -222,11 +241,33 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onStart() {
+
+        if(!mBound){
+            Intent intent = new Intent("com.jonghyeon.aidlservice.RemoteService");
+            intent.setPackage("com.jonghyeon.aidlservice");
+            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        }
+
         Log.d("haha", "onStart");
 
         callLastKnownLocation();
         super.onStart();
     }
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder iBinder) {
+            mService = IMyAidlInterface.Stub.asInterface(iBinder);
+            mBound = true;
+        }
+
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mService = null;
+            mBound = false;
+        }
+    };
 
     public void callLastKnownLocation() {
         Log.i("haha", "callLast");
