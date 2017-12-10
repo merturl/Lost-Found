@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Bundle;
+import android.os.Messenger;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -16,6 +16,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -37,10 +38,7 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-
-public class getItemActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
-
+public class MsgActivity extends AppCompatActivity {
     private ImageView imageViewgetItem;
     private StorageReference mStorageRef;
     private Bitmap bitmap;
@@ -53,9 +51,7 @@ public class getItemActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_get_item);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setContentView(R.layout.activity_msg);
 
         //외부 저장소 사진 읽기, 쓰기 권한 체크
         checkPerssions();
@@ -63,7 +59,7 @@ public class getItemActivity extends AppCompatActivity
 
 
         //imgview에 리스너를 달아 이미지뷰 클릭시 이미지 추가를 함
-        imageViewgetItem = (ImageView) findViewById(R.id.getImage);
+        imageViewgetItem = (ImageView) findViewById(R.id.msg_img);
         imageViewgetItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,129 +69,49 @@ public class getItemActivity extends AppCompatActivity
             }
         });
 
-
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-
-            }
-        });
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
     }
 
     // DB에 아이템 저장
-    public void saveGetItem(View v) {
+    public void saveMsg(View v) {
         Intent getIntent = getIntent();
+        String markerid = getIntent.getStringExtra("MarkerId");
+        String touid = getIntent.getStringExtra("toUid");
+        String fromuid = mFirebaseAuth.getCurrentUser().getUid();
+//        Toast.makeText(this, "touid="+touid, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "marker="+markerid, Toast.LENGTH_SHORT).show();
+//        Log.d("acac", markerid);
+//        Log.d("acac","touid"+markerid);
+//        Log.d("acac","fromuid"+ markerid);
 
         // 입력창
-        EditText edittitle = (EditText)findViewById(R.id.edit_Gettitle);
-        EditText editcontent = (EditText)findViewById(R.id.edit_Getcontent);
-        EditText edittime = (EditText)findViewById(R.id.edit_Gettime);
+        EditText editMsg = (EditText)findViewById(R.id.msg_content);
 
         // 저장할 정보
-        double i = 0;
-        double lat = getIntent.getDoubleExtra("lat", i);
-        double lng = getIntent.getDoubleExtra("lng", i);
-        if(edittitle.getText().toString().matches("") || editcontent.getText().toString().matches("")){
-            Toast.makeText(getItemActivity.this, "please fill Title or Contnte.", Toast.LENGTH_SHORT).show();
-            Log.d("acac","gettitle="+edittitle.getText() );
+        if(editMsg.getText().toString().matches("")){
+            Toast.makeText(this, "Please, Fill all content.", Toast.LENGTH_SHORT).show();
             return;
         } else {
-            String title = edittitle.getText().toString();
-            String content = editcontent.getText().toString();
-            String time = edittime.getText().toString();
+            String msg = editMsg.getText().toString();
 
             // 아이템 저장 lat, lng,  title, content, time
-            Item saveitem = new Item(true, lat, lng, title, content);
-            DatabaseReference mFireRef = mFireDB.getReference("Item/"+mFirebaseAuth.getCurrentUser().getUid()).push();
-            mFireRef.setValue(saveitem);
+            Message saveMsg = new Message(touid, fromuid, msg);
+            DatabaseReference mFireRef = mFireDB.getReference("message/"+markerid).push();
+            mFireRef.setValue(saveMsg);
             String postId = mFireRef.getKey();
+            Toast.makeText(this, "postId"+postId, Toast.LENGTH_LONG).show();
+
 
             // firestorage 에 이미지 업로드
             if(!uploadImage(postId)) return;
 
-            // 저장 후 입력 내용 초기화
-            edittitle.setText("");
-            editcontent.setText("");
-            edittime.setText("");
+
         }
 
         finish();
         // 화면전환 애니메이션 효과
-       overridePendingTransition(R.anim.anim_slide_in_left,R.anim.anim_slide_out_right);
+        overridePendingTransition(R.anim.anim_slide_in_left,R.anim.anim_slide_out_right);
     }
 
-
-
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.get_item, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
 
     //파이어스토어에 이미지 저장
     public boolean uploadImage(String getitemkey){
@@ -204,8 +120,7 @@ public class getItemActivity extends AppCompatActivity
         }
 
         //파이어스토어 접근 레퍼런스    // Item/image/uid/randomkey.jpg
-        StorageReference reference = mStorageRef.child("Item/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+getitemkey +".jpg");
-
+        StorageReference reference = mStorageRef.child("message/image/"+mFirebaseAuth.getCurrentUser().getUid()+"/"+getitemkey +".jpg");
 
         //파이어베이스에 쓰이는 데이터로 이미지 변환
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -230,10 +145,10 @@ public class getItemActivity extends AppCompatActivity
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
 //                Uri downloadUrl = taskSnapshot.getDownloadUrl(); //이미지가 저장된 주소의 URL
-                Toast.makeText(getItemActivity.this, "이미지 저장 성공", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MsgActivity.this, "이미지 저장 성공", Toast.LENGTH_SHORT).show();
             }
         });
-        Toast.makeText(getItemActivity.this, "return uri== " + getitemkey, Toast.LENGTH_LONG).show();
+        Toast.makeText(MsgActivity.this, "return uri== " + getitemkey, Toast.LENGTH_LONG).show();
         return true;
     }
 

@@ -1,6 +1,7 @@
 package com.example.jongho.newproject_1;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.ContentValues;
@@ -25,6 +26,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -105,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private EditText addr;
 
-    private SQLiteDatabase mDB;
+    public static SQLiteDatabase mDB;
     private Cursor mCursor;
     private ContentValues v = new ContentValues();
 
@@ -128,6 +131,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private IMyAidlInterface mService;
     boolean mBound = false;
 
+    //For search activity
+    private Intent search;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -139,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         geofencingClient = LocationServices.getGeofencingClient(this);
         mGeofenceList = new ArrayList<Geofence>();
+        search = new Intent(this, SearchActivity.class);
 
         //checkforlocation
         checkForLocationRequest();
@@ -151,6 +158,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Init googleMap
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
     }
 
 
@@ -168,9 +177,69 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         tran.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                List<Address> list = null;
-                String str = addr.getText().toString();
+                startActivityForResult(search, 0);
+            }
+        });
 
+//        tran.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                List<Address> list = null;
+//                String str = addr.getText().toString();
+//
+//                if(mBound){
+//                    try{
+//                        Toast.makeText(getApplicationContext(), mService.add(11,22)+","+ mService.sub(5,9),Toast.LENGTH_SHORT).show();
+//                        Log.i("haha", "/"+mService.add(11,22));
+//                    }catch (RemoteException e){
+//
+//                    }
+//                }
+//
+//                //Stop My currentLocation when users search location to use Address
+//                if (mFusedLocationClient != null) {
+//                    mFusedLocationClient.removeLocationUpdates(locationCallback).addOnCompleteListener(MainActivity.this, new OnCompleteListener<Void>() {
+//                        @Override
+//                        public void onComplete(@NonNull Task<Void> task) {
+//                            mFusedLocationClient = null;
+//                        }
+//                    });
+//                }
+//
+//                try {
+//                    list = geo.getFromLocationName(str, 10);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    Log.e("HAHA", "서버에서 주소 못찾음");
+//                }
+//
+//                if (list != null) {
+//                    if (list.size() == 0) {
+//                        Toast.makeText(MainActivity.this, "해당 주소정보 없음", Toast.LENGTH_SHORT).show();
+//                    } else {
+//
+//                        Toast.makeText(MainActivity.this, String.valueOf(list.get(0).getLatitude()) + ", " + String.valueOf(list.get(0).getLongitude()), Toast.LENGTH_LONG).show();
+//                        googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(list.get(0).getLatitude(), list.get(0).getLongitude())));
+//                        v.put("addr", addr.getText().toString());
+//                        v.put("lat", list.get(0).getLatitude());
+//                        v.put("lon", list.get(0).getLongitude());
+//                        mDB.insert("my_Geo", null, v);
+//                        loadSearchRecord();
+//                    }
+//                }
+//            }
+//        });
+    }
+
+    @Override
+    protected void onActivityResult(int req, int res, Intent intent) {
+        super.onActivityResult(req, res, intent);
+        if(req == 0) {
+            if(res == Activity.RESULT_OK) {
+                Double lat = intent.getDoubleExtra("lat", 0.0);
+                Double lon = intent.getDoubleExtra("lon", 0.0);
+                String addr = intent.getStringExtra("addr");
+                this.addr.setText(addr);
                 if(mBound){
                     try{
 //                        Toast.makeText(getApplicationContext(), mService.add(11,22)+","+ mService.sub(5,9),Toast.LENGTH_SHORT).show();
@@ -189,29 +258,39 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     });
                 }
+                googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(lat, lon)));
+                v.put("addr", this.addr.getText().toString());
+                v.put("lat", lat);
+                v.put("lon", lon);
+                mDB.insert("my_Geo", null, v);
+                loadSearchRecord();
+            }
+            else if(res == 444) {
+                Double lat = Double.valueOf(intent.getStringExtra("lat"));
+                Double lon = Double.valueOf(intent.getStringExtra("lon"));
+                String addr = intent.getStringExtra("addr");
+                this.addr.setText(addr);
+                if(mBound){
+                    try{
+                        Toast.makeText(getApplicationContext(), mService.add(11,22)+","+ mService.sub(5,9),Toast.LENGTH_SHORT).show();
+                        Log.i("haha", "/"+mService.add(11,22));
+                    }catch (RemoteException e){
 
-                try {
-                    list = geo.getFromLocationName(str, 10);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Log.e("HAHA", "서버에서 주소 못찾음");
-                }
-
-                if (list != null) {
-                    if (list.size() == 0) {
-                        Toast.makeText(MainActivity.this, "해당 주소정보 없음", Toast.LENGTH_SHORT).show();
-                    } else {
-
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(list.get(0).getLatitude(), list.get(0).getLongitude())));
-                        v.put("addr", addr.getText().toString());
-                        v.put("lat", list.get(0).getLatitude());
-                        v.put("lon", list.get(0).getLongitude());
-                        mDB.insert("my_Geo", null, v);
-                        loadSearchRecord();
                     }
                 }
+
+                //Stop My currentLocation when users search location to use Address
+                if (mFusedLocationClient != null) {
+                    mFusedLocationClient.removeLocationUpdates(locationCallback).addOnCompleteListener(MainActivity.this, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            mFusedLocationClient = null;
+                        }
+                    });
+                }
+                googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(lat, lon)));
             }
-        });
+        }
     }
 
     @Override
@@ -233,7 +312,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (mCursor != null) {
             if (mCursor.moveToFirst()) {
                 do {
-                    Log.e("HAHA", mCursor.getString(0) + ", " + mCursor.getString(1) + ", " + mCursor.getString(2));
+                    Log.e("HEY", mCursor.getString(0) + ", " + mCursor.getString(1) + ", " + mCursor.getString(2));
                 } while (mCursor.moveToNext());
             }
         }
@@ -548,18 +627,37 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     HashMap<String, Object> tag;
                     tag = (HashMap) marker.getTag();
 
+//                    //테스트용 to ItemViewActivity
+//                    Intent ItemView = new Intent(MainActivity.this, ItemViewActivity.class);
+//                    ItemView.putExtra("DbRef", tag.get("DbRef").toString());
+//                    ItemView.putExtra("ImageRef", tag.get("ImageRef").toString());
+//                    ItemView.putExtra("Uid", tag.get("Uid").toString());
+//                    ItemView.putExtra("MarkerId", tag.get("MarkerId").toString());
+//                    Log.d("acac", "Uid="+tag.get("Uid").toString());
+//                    Log.d("acac", "MarkerId="+tag.get("MarkerId").toString());
+//                    startActivity(ItemView);
+//                    return true;
+
                     // 내가 생성한 마커면 수정, 아니면 읽기만 가능
                     Log.d("uid", "uid=="+tag.get("Uid"));
                     if(tag.get("Uid") == mFirebaseAuth.getCurrentUser().getUid()){
                         Intent SetItemView = new Intent(MainActivity.this, SetItemViewActivity.class);
                         SetItemView.putExtra("DbRef", tag.get("DbRef").toString());
                         SetItemView.putExtra("ImageRef", tag.get("ImageRef").toString());
+                        SetItemView.putExtra("Uid", tag.get("Uid").toString());
+                        SetItemView.putExtra("MarkerId", tag.get("MarkerId").toString());
+                        Log.d("acac", "Uid="+tag.get("Uid").toString());
+                        Log.d("acac", "MarkerId="+tag.get("MarkerId").toString());
                         startActivity(SetItemView);
                         return true;
                     } else {
                         Intent ItemView = new Intent(MainActivity.this, ItemViewActivity.class);
                         ItemView.putExtra("DbRef", tag.get("DbRef").toString());
                         ItemView.putExtra("ImageRef", tag.get("ImageRef").toString());
+                        ItemView.putExtra("Uid", tag.get("Uid").toString());
+                        ItemView.putExtra("MarkerId", tag.get("MarkerId").toString());
+                        Log.d("acac", "Uid="+tag.get("Uid").toString());
+                        Log.d("acac", "MarkerId="+tag.get("MarkerId").toString());
                         startActivity(ItemView);
                         return true;
                     }
@@ -642,6 +740,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             tag.put("DbRef", "Item/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + itemSnapshot.getKey());
                             tag.put("ImageRef", "Item/image/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + itemSnapshot.getKey());
                             tag.put("Uid",mFirebaseAuth.getCurrentUser().getUid());
+                            tag.put("MarkerId", itemSnapshot.getKey());
                             tag.put("distance", distance);
                             addMarker.setTag(tag);
 
