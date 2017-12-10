@@ -63,4 +63,13 @@
         android:layout_height="match_parent"
         tools:context="com.example.jongho.newproject_1.MapsActivity" />
 
+    <Button
+        android:id="@+id/setRangeButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/linearLayout1"
+        android:background="@android:drawable/ic_menu_mylocation"
+        android:onClick="customMyLocationButton"/>
+
 </RelativeLayout>

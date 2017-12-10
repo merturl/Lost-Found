@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationCallback locationCallback;
     //Location Request Interval
-    protected static long MIN_UPDATE_INTERVAL = 60 * 1000; // 1  minute is the minimum Android recommends, but we use 30 seconds
+    protected static long MIN_UPDATE_INTERVAL = 10 * 1000; // 1  minute is the minimum Android recommends, but we use 30 seconds
     private GeofencingClient geofencingClient;
 
     //LocationRequest
@@ -491,17 +491,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             startLocationPermissionRequest(REQUEST_PERMISSIONS_MYLOCATION_CODE);
             return;
         }
-
-        this.googleMap.setMyLocationEnabled(true);
-        this.googleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
-            @Override
-            public boolean onMyLocationButtonClick() {
-                if(mFusedLocationClient == null)
-                    createLocationCallBack();
-                return false;
-            }
-        });
-
         // 마커 클릭 이벤트
         this.googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -536,6 +525,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
         this.googleMap.setOnMapClickListener(this);
+    }
+
+    public void customMyLocationButton(View view){
+        if(mFusedLocationClient == null) {
+            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            callCurrentLocation();
+        }else{
+            Log.d("haha", "mfused Notnull");
+        }
+        if(lastLocation != null || currentLocation != null){
+            Log.d("haha", "mfunotnull2"+ currentLocation.getLatitude() +"/"+lastLocation.getLatitude());
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())));
+        }
     }
 
     @Override
