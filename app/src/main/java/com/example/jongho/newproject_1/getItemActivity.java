@@ -120,8 +120,8 @@ public class getItemActivity extends AppCompatActivity
 
 
         // 아이템 저장 lat, lng,  title, content, time
-        Item saveitem = new Item(lat, lng, title, content);
-        DatabaseReference mFireRef = mFireDB.getReference("getItem/"+mFirebaseAuth.getCurrentUser().getUid()).push();
+        Item saveitem = new Item(true, lat, lng, title, content);
+        DatabaseReference mFireRef = mFireDB.getReference("Item/"+mFirebaseAuth.getCurrentUser().getUid()).push();
         mFireRef.setValue(saveitem);
         String postId = mFireRef.getKey();
 

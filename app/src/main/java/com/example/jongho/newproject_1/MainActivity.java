@@ -111,11 +111,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.i("haha", "oncreate");
-<<<<<<< HEAD
-=======
-
->>>>>>> feature/SetViewItem
-
 
         //fuseLocationClient init
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -198,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(latLng);
                 markerOptions.title("Current Position" + latLng.latitude + "/" + latLng.longitude);
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+                markerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_redmarker));
                 currentMarker = googleMap.addMarker(markerOptions);
                 //Marker trace to camera
                 googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -255,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             MarkerOptions markerOptions = new MarkerOptions();
                             markerOptions.position(latLng);
                             markerOptions.title("Last Position");
-                            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+                            markerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_redmarker));
                             currentMarker = googleMap.addMarker(markerOptions);
                             Log.d("haha","lastcurrent" + currentMarker);
                             googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -460,95 +455,36 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void display() {
         Log.i(TAG, "display");
         Log.i("haha", "display");
-        // getItem 수신
-        mFireDB.getReference("getItem/" + mFirebaseAuth.getCurrentUser().getUid())
-                .addValueEventListener(new ValueEventListener() {
-                    // 리스트의 아이템을 검색하거나 아이템 추가가 있을 때 수신
-                    @SuppressLint("MissingPermission")
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        Log.d("haha", "hzasdasd");
-                        // 아이템 받아오기
-                        Item getitem = dataSnapshot.getValue(Item.class);
-
-                        // 구글맵에 마커 추가
-                        addMarker = MainActivity.this.googleMap.addMarker(new MarkerOptions()
-
-                                .position(new LatLng(getitem.getLat(), getitem.getLng()))
-                                .title(getitem.getTitle())
-                                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_getitem)));
-
-                        // currentMarker와의 거리 구하기
-                        Location locationMarker = new Location("marker");
-                        Location current = new Location("current");
-
-                        locationMarker.setLatitude(getitem.getLat());
-                        locationMarker.setLongitude(getitem.getLng());
-                        current.setLatitude(currentMarker.getPosition().latitude);
-                        current.setLongitude(currentMarker.getPosition().longitude);
-
-                        float distance = locationMarker.distanceTo(current);    // m 단위
-
-                        // 마커에 달 태그
-                        HashMap<String, Object> tag = new HashMap<String, Object>();
-                        tag.put("DbRef", "getItem/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + dataSnapshot.getKey());
-                        tag.put("ImageRef", "Item/image/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + dataSnapshot.getKey());
-                        tag.put("Uid",mFirebaseAuth.getCurrentUser().getUid());
-                        tag.put("distance", distance);
-
-                        addMarker.setTag(tag);
-                        if(distance < 100) {
-                            Zone itemzone = new Zone();
-                            itemzone.setRef("getItem/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + dataSnapshot.getKey());
-                            itemzone.setLatlng(new LatLng(getitem.getLat(), getitem.getLng()));
-                            itemzone.setDistance(distance);
-                            zonelist.add(itemzone);
-                        }
-
-                        if (currentLocation != null) {
-                            Log.d("haha", "addgeofence" + currentLocation.getLongitude() + "+" + currentLocation.getLatitude());
-                            if(zonelist.size() > 0) {
-                                Log.d("haha", "/"+zonelist.size());
-                                geofencingClient.addGeofences(getGeofencingRequest(zonelist), getGeofencePendingIntent()).addOnSuccessListener(MainActivity.this, new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-//                                        Toast.makeText(MainActivity.this, "SuccessAddGeofence", Toast.LENGTH_LONG).show();
-                                    }
-                                }).addOnFailureListener(MainActivity.this, new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(MainActivity.this, "failaddGeofence", Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {}
-                });
-
-        // lostItem 수신
-        mFireDB.getReference("lostItem/"+mFirebaseAuth.getCurrentUser().getUid())
+        // Item 수신
+        mFireDB.getReference("Item/"+mFirebaseAuth.getCurrentUser().getUid())
                 .addChildEventListener(new ChildEventListener() {
 
                     // 리스트의 아이템을 검색하거나 아이템 추가가 있을 때 수신
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        Item getitem = dataSnapshot.getValue(Item.class);
+                        Item item = dataSnapshot.getValue(Item.class);
 
                         // 구글맵에 마커 추가
-                        addMarker= MainActivity.this.googleMap.addMarker(new MarkerOptions()
-                                .position(new LatLng(getitem.getLat(), getitem.getLng()))
-                                .title(getitem.getTitle())
-                                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_lostitem)));
+                        if( item.getType() == true ){
+                            addMarker = MainActivity.this.googleMap.addMarker(new MarkerOptions()
+
+                                    .position(new LatLng(item.getLat(), item.getLng()))
+                                    .title(item.getTitle())
+                                    .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_getitem)));
+                        } else {
+                            addMarker= MainActivity.this.googleMap.addMarker(new MarkerOptions()
+                                    .position(new LatLng(item.getLat(), item.getLng()))
+                                    .title(item.getTitle())
+                                    .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_lostitem)));
+                        }
+
 
                         // currentMarker와의 거리 구하기
                         Location locationMarker = new Location("marker");
                         Location current = new Location("current");
 
-                        locationMarker.setLatitude(getitem.getLat());
-                        locationMarker.setLongitude(getitem.getLng());
+                        locationMarker.setLatitude(item.getLat());
+                        locationMarker.setLongitude(item.getLng());
                         current.setLatitude(currentMarker.getPosition().latitude);
                         current.setLongitude(currentMarker.getPosition().longitude);
                         Log.d("haha", String.valueOf(currentMarker.getPosition().latitude));
@@ -564,8 +500,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         if(distance < 100) {
                             Zone itemzone = new Zone();
-                            itemzone.setRef("getItem/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + dataSnapshot.getKey());
-                            itemzone.setLatlng(new LatLng(getitem.getLat(), getitem.getLng()));
+                            itemzone.setRef("item/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + dataSnapshot.getKey());
+                            itemzone.setLatlng(new LatLng(item.getLat(), item.getLng()));
                             itemzone.setDistance(distance);
                             zonelist.add(itemzone);
                         }

@@ -61,11 +61,9 @@ public class ItemViewActivity extends AppCompatActivity {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-<<<<<<< HEAD
                 mStorageRef = FirebaseStorage.getInstance().getReference();
                 StorageReference storageReference = mStorageRef.child(ImageRef+ ".jpg");
-=======
->>>>>>> feature/SetViewItem
+
                 Item item = dataSnapshot.getValue(Item.class);
 
                 TextView title = (TextView)findViewById(R.id.text_ItemTitle);
@@ -73,9 +71,9 @@ public class ItemViewActivity extends AppCompatActivity {
                 TextView time = (TextView)findViewById(R.id.text_ItemTime);
 
 
-                mStorageRef = FirebaseStorage.getInstance().getReference();
-                StorageReference storageReference = mStorageRef.child(ImageRef+ ".jpg");
-
+//                mStorageRef = FirebaseStorage.getInstance().getReference();
+//                StorageReference storageReference = mStorageRef.child(ImageRef+ ".jpg");
+//
                 Log.d("image","storageReference="+ storageReference);
                 Log.d("image","beforeload="+storageReference.getDownloadUrl());
 
@@ -96,14 +94,12 @@ public class ItemViewActivity extends AppCompatActivity {
                 title.setText(item.getTitle());
                 content.setText(item.getContent());
                 time.setText(item.getTime());
-<<<<<<< HEAD
+
                 // Load the image using Glide
                 Glide.with(ItemViewActivity.this)
                         .using(new FirebaseImageLoader())
                         .load(storageReference)
                         .into(imgView);
-=======
->>>>>>> feature/SetViewItem
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
