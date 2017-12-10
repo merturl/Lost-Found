@@ -1,6 +1,7 @@
 package com.example.jongho.newproject_1;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -41,6 +42,10 @@ public class LostItemActivity extends AppCompatActivity {
     private FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase mFireDB = FirebaseDatabase.getInstance();
 
+    EditText edittitle;
+    EditText editcontent;
+    EditText edittime;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,9 +79,32 @@ public class LostItemActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        SharedPreferences sharedPreferences = getSharedPreferences("prefItemData", MODE_PRIVATE);
+
+        edittitle = (EditText)findViewById(R.id.edit_Losttitle);
+        edittitle.setText(sharedPreferences.getString("title", ""));
+
+        editcontent = (EditText)findViewById(R.id.edit_Lostcontent);
+        editcontent.setText(sharedPreferences.getString("content", ""));
+
+        edittime = (EditText)findViewById(R.id.edit_Losttime);
+        edittime.setText(sharedPreferences.getString("time", ""));
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
 
+        SharedPreferences sharedPreferences = getSharedPreferences("prefItemData", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("title", edittitle.getText().toString());
+        editor.putString("content", editcontent.getText().toString());
+        editor.putString("time", edittime.getText().toString());
+
+        editor.commit();
     }
 
     // DB에 아이템 저장
@@ -85,9 +113,9 @@ public class LostItemActivity extends AppCompatActivity {
 
 
         // 입력한 정보 가져오기
-        EditText edittitle = (EditText)findViewById(R.id.edit_Losttitle);
-        EditText editcontent = (EditText)findViewById(R.id.edit_Lostcontent);
-        EditText edittime = (EditText)findViewById(R.id.edit_Losttime);
+        edittitle = (EditText)findViewById(R.id.edit_Losttitle);
+        editcontent = (EditText)findViewById(R.id.edit_Lostcontent);
+        edittime = (EditText)findViewById(R.id.edit_Losttime);
 
         // 저장할 정보
         double i = 0;

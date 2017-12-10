@@ -586,6 +586,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.d("haha", "onMpaReady");
 
         callLastKnownLocation();
+        callCurrentLocation();
 
         // 나침반이 보이게 설정
         this.googleMap.getUiSettings().setCompassEnabled(true);

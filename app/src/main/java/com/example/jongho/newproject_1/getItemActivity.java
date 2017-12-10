@@ -1,6 +1,7 @@
 package com.example.jongho.newproject_1;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -41,6 +42,10 @@ import java.io.IOException;
 public class getItemActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private EditText edittitle;
+    private EditText editcontent;
+    private EditText edittime;
+
     private ImageView imageViewgetItem;
     private StorageReference mStorageRef;
     private Bitmap bitmap;
@@ -56,6 +61,12 @@ public class getItemActivity extends AppCompatActivity
         setContentView(R.layout.activity_get_item);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+
+
+
+
+
 
         //외부 저장소 사진 읽기, 쓰기 권한 체크
         checkPerssions();
@@ -95,14 +106,42 @@ public class getItemActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        SharedPreferences sharedPreferences = getSharedPreferences("prefItemData", MODE_PRIVATE);
+
+        edittitle = (EditText)findViewById(R.id.edit_Gettitle);
+        edittitle.setText(sharedPreferences.getString("title", ""));
+
+        editcontent = (EditText)findViewById(R.id.edit_Getcontent);
+        editcontent.setText(sharedPreferences.getString("content", ""));
+
+        edittime = (EditText)findViewById(R.id.edit_Gettime);
+        edittime.setText(sharedPreferences.getString("time", ""));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        SharedPreferences sharedPreferences = getSharedPreferences("prefItemData", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("title", edittitle.getText().toString());
+        editor.putString("content", editcontent.getText().toString());
+        editor.putString("time", edittime.getText().toString());
+        editor.commit();
+    }
+
     // DB에 아이템 저장
     public void saveGetItem(View v) {
         Intent getIntent = getIntent();
 
         // 입력창
-        EditText edittitle = (EditText)findViewById(R.id.edit_Gettitle);
-        EditText editcontent = (EditText)findViewById(R.id.edit_Getcontent);
-        EditText edittime = (EditText)findViewById(R.id.edit_Gettime);
+        edittitle = (EditText)findViewById(R.id.edit_Gettitle);
+        editcontent = (EditText)findViewById(R.id.edit_Getcontent);
+        edittime = (EditText)findViewById(R.id.edit_Gettime);
 
         // 저장할 정보
         double i = 0;
