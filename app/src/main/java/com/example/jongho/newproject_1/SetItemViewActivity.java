@@ -217,7 +217,9 @@ public class SetItemViewActivity extends AppCompatActivity {
         DatabaseReference mFireRef = mFireDB.getReference(DbRef);
         mFireRef.removeValue();
 
-        StorageReference reference = mStorageRef.child(ImageRef+".jpeg");
+        StorageReference reference = mStorageRef.child(ImageRef+".jpg");
+        Log.d("Image","Image == " + ImageRef+".jpg");
+        Toast.makeText(this, "Image == " + ImageRef+".jpg", Toast.LENGTH_LONG).show();
         reference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
