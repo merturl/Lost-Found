@@ -89,7 +89,6 @@ public class ContractsActivity extends AppCompatActivity implements View.OnClick
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         Iterator iterator = mData.get(i).entrySet().iterator();
         Map.Entry entry = (Map.Entry)iterator.next();
-        Toast.makeText(this, "key : " + entry.getKey().toString() + ", value : " + entry.getValue().toString(), Toast.LENGTH_LONG).show();
         sendSMS(entry.getValue().toString(), SEND_MESSAGE);
     }
 

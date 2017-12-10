@@ -1,6 +1,7 @@
 package com.example.jongho.newproject_1;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.ContentValues;
@@ -13,7 +14,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
@@ -67,7 +67,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.jonghyeon.aidlservice.IMyAidlInterface;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -105,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private EditText addr;
 
-    private SQLiteDatabase mDB;
+    public static SQLiteDatabase mDB;
     private Cursor mCursor;
     private ContentValues v = new ContentValues();
 
@@ -128,6 +127,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private IMyAidlInterface mService;
     boolean mBound = false;
 
+    //For search activity
+    private Intent search;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -139,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         geofencingClient = LocationServices.getGeofencingClient(this);
         mGeofenceList = new ArrayList<Geofence>();
+        search = new Intent(this, SearchActivity.class);
 
         //checkforlocation
         checkForLocationRequest();
@@ -151,6 +154,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Init googleMap
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
     }
 
 
@@ -168,9 +173,69 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         tran.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                List<Address> list = null;
-                String str = addr.getText().toString();
+                startActivityForResult(search, 0);
+            }
+        });
 
+//        tran.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                List<Address> list = null;
+//                String str = addr.getText().toString();
+//
+//                if(mBound){
+//                    try{
+//                        Toast.makeText(getApplicationContext(), mService.add(11,22)+","+ mService.sub(5,9),Toast.LENGTH_SHORT).show();
+//                        Log.i("haha", "/"+mService.add(11,22));
+//                    }catch (RemoteException e){
+//
+//                    }
+//                }
+//
+//                //Stop My currentLocation when users search location to use Address
+//                if (mFusedLocationClient != null) {
+//                    mFusedLocationClient.removeLocationUpdates(locationCallback).addOnCompleteListener(MainActivity.this, new OnCompleteListener<Void>() {
+//                        @Override
+//                        public void onComplete(@NonNull Task<Void> task) {
+//                            mFusedLocationClient = null;
+//                        }
+//                    });
+//                }
+//
+//                try {
+//                    list = geo.getFromLocationName(str, 10);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    Log.e("HAHA", "서버에서 주소 못찾음");
+//                }
+//
+//                if (list != null) {
+//                    if (list.size() == 0) {
+//                        Toast.makeText(MainActivity.this, "해당 주소정보 없음", Toast.LENGTH_SHORT).show();
+//                    } else {
+//
+//                        Toast.makeText(MainActivity.this, String.valueOf(list.get(0).getLatitude()) + ", " + String.valueOf(list.get(0).getLongitude()), Toast.LENGTH_LONG).show();
+//                        googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(list.get(0).getLatitude(), list.get(0).getLongitude())));
+//                        v.put("addr", addr.getText().toString());
+//                        v.put("lat", list.get(0).getLatitude());
+//                        v.put("lon", list.get(0).getLongitude());
+//                        mDB.insert("my_Geo", null, v);
+//                        loadSearchRecord();
+//                    }
+//                }
+//            }
+//        });
+    }
+
+    @Override
+    protected void onActivityResult(int req, int res, Intent intent) {
+        super.onActivityResult(req, res, intent);
+        if(req == 0) {
+            if(res == Activity.RESULT_OK) {
+                Double lat = intent.getDoubleExtra("lat", 0.0);
+                Double lon = intent.getDoubleExtra("lon", 0.0);
+                String addr = intent.getStringExtra("addr");
+                this.addr.setText(addr);
                 if(mBound){
                     try{
 //                        Toast.makeText(getApplicationContext(), mService.add(11,22)+","+ mService.sub(5,9),Toast.LENGTH_SHORT).show();
@@ -189,29 +254,39 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     });
                 }
+                googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(lat, lon)));
+                v.put("addr", this.addr.getText().toString());
+                v.put("lat", lat);
+                v.put("lon", lon);
+                mDB.insert("my_Geo", null, v);
+                loadSearchRecord();
+            }
+            else if(res == 444) {
+                Double lat = Double.valueOf(intent.getStringExtra("lat"));
+                Double lon = Double.valueOf(intent.getStringExtra("lon"));
+                String addr = intent.getStringExtra("addr");
+                this.addr.setText(addr);
+                if(mBound){
+                    try{
+                        Toast.makeText(getApplicationContext(), mService.add(11,22)+","+ mService.sub(5,9),Toast.LENGTH_SHORT).show();
+                        Log.i("haha", "/"+mService.add(11,22));
+                    }catch (RemoteException e){
 
-                try {
-                    list = geo.getFromLocationName(str, 10);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Log.e("HAHA", "서버에서 주소 못찾음");
-                }
-
-                if (list != null) {
-                    if (list.size() == 0) {
-                        Toast.makeText(MainActivity.this, "해당 주소정보 없음", Toast.LENGTH_SHORT).show();
-                    } else {
-
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(list.get(0).getLatitude(), list.get(0).getLongitude())));
-                        v.put("addr", addr.getText().toString());
-                        v.put("lat", list.get(0).getLatitude());
-                        v.put("lon", list.get(0).getLongitude());
-                        mDB.insert("my_Geo", null, v);
-                        loadSearchRecord();
                     }
                 }
+
+                //Stop My currentLocation when users search location to use Address
+                if (mFusedLocationClient != null) {
+                    mFusedLocationClient.removeLocationUpdates(locationCallback).addOnCompleteListener(MainActivity.this, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            mFusedLocationClient = null;
+                        }
+                    });
+                }
+                googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(lat, lon)));
             }
-        });
+        }
     }
 
     @Override
@@ -233,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (mCursor != null) {
             if (mCursor.moveToFirst()) {
                 do {
-                    Log.e("HAHA", mCursor.getString(0) + ", " + mCursor.getString(1) + ", " + mCursor.getString(2));
+                    Log.e("HEY", mCursor.getString(0) + ", " + mCursor.getString(1) + ", " + mCursor.getString(2));
                 } while (mCursor.moveToNext());
             }
         }
@@ -316,7 +391,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 markerOptions.title("Current Position" + latLng.latitude + "/" + latLng.longitude);
                 markerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_redmarker));
                 currentMarker = googleMap.addMarker(markerOptions);
+                display();
                 //Marker trace to camera
+//                display();
                 googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
             }
         };
@@ -345,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             } else {
                 //currentLocations update time(interval time)
                 mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
-                display();
+//                display();
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -508,7 +585,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         this.googleMap = googleMap;
         Log.d("haha", "onMpaReady");
 
-        callCurrentLocation();
+        callLastKnownLocation();
 
         // 나침반이 보이게 설정
         this.googleMap.getUiSettings().setCompassEnabled(true);
@@ -650,7 +727,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             locationMarker.setLongitude(item.getLng());
                             current.setLatitude(currentMarker.getPosition().latitude);
                             current.setLongitude(currentMarker.getPosition().longitude);
-                            Log.d("haha", String.valueOf(currentMarker.getPosition().latitude));
+                            Log.d("haha", "display"+String.valueOf(currentMarker.getPosition().latitude));
 
                             float distance = locationMarker.distanceTo(current);    // m 단위
 
@@ -741,6 +818,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GeofencingRequest getGeofencingRequest(List<Zone> zonelist) {
 
         Collections.sort(zonelist, new CompareDistanceAsc());
+
         for(Zone zone : zonelist ) {
             mapCircle = googleMap.addCircle(new CircleOptions().center(new LatLng(zone.getLatlng().latitude, zone.getLatlng().longitude))
                     .radius(CIRCLE_BOUND)
@@ -749,12 +827,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             mGeofenceList.add(new Geofence.Builder()
                     .setRequestId(zone.getRef())
                     .setCircularRegion(zone.getLatlng().latitude, zone.getLatlng().longitude, CIRCLE_BOUND)
-                    .setExpirationDuration(360000)
+                    .setExpirationDuration(Geofence.NEVER_EXPIRE)
                     .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT).build());    // 지오펜스 발생 시점
         }
 
         GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
-        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_DWELL);
+        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_EXIT);
         builder.addGeofences(mGeofenceList);
         return builder.build();
     }

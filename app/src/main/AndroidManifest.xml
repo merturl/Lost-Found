@@ -93,8 +93,9 @@
         <activity
             android:name=".SetItemViewActivity"
             android:label="@string/title_activity_set_item_view"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ContractsActivity" />
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".ContractsActivity"/>
+        <activity android:name=".SearchActivity"/>
 
         <receiver
             android:name=".SMSBroadcast"
