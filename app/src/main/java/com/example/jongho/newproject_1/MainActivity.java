@@ -391,7 +391,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 markerOptions.title("Current Position" + latLng.latitude + "/" + latLng.longitude);
                 markerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_redmarker));
                 currentMarker = googleMap.addMarker(markerOptions);
-                display();
+//                display();
                 //Marker trace to camera
 //                display();
                 googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -422,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             } else {
                 //currentLocations update time(interval time)
                 mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
-//                display();
+                display();
             }
         } catch (Exception ex) {
             ex.printStackTrace();
