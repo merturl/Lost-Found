@@ -143,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
     }
 
+
     public void initDB() {
         addr = (EditText) findViewById(R.id.addr);
         Button tran = (Button) findViewById(R.id.tran);
