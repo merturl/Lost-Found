@@ -1,74 +1,154 @@
 package com.example.jongho.newproject_1;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.ListActivity;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
+import android.telephony.SmsManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by JongHo on 2017-12-10.
  */
 
-public class ContractsActivity extends AppCompatActivity {
-    private ListView listView;
-    private static final int PERMISSIONS_REQUEST_READ_CONTRACTS = 100;
+public class ContractsActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
+    private static final int PERMISSION_SMS = 100;
+    private Context mContext;
+    private ArrayList<Map<String, String>> mData;
+    private ListView mListView;
+    private Button mAddress;
+    private final String SEND_MESSAGE = "광고 메세지는 다시 정합시다";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contracts);
 
-        this.listView = (ListView) findViewById(R.id.listView);
-        showContacts();
+        mContext = this;
+        this.mListView = (ListView) findViewById(R.id.listView);
+        this.mAddress = (Button) findViewById(R.id.addr);
+        mAddress.setOnClickListener(this);
+        mListView.setOnItemClickListener(this);
     }
 
-    private void showContacts() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[] {Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTRACTS);
-        }
-        else {
-            List<String> contacts = getContactNames();
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, contacts);
-            listView.setAdapter(adapter);
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.addr:
+                mData = new ArrayList<Map<String, String>>();
+                Cursor c = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+
+                while(c.moveToNext()) {
+                    HashMap<String, String> map = new HashMap<String, String>();
+                    String id = c.getString(c.getColumnIndex(ContactsContract.Contacts._ID));
+                    String name = c.getString(c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY));
+                    map.put("name", name);
+                    Cursor phoneCursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + id,null, null);
+
+                    if (phoneCursor.moveToFirst()) {
+                        String number = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        map.put("phone", number);
+                    }
+
+                    phoneCursor.close();
+                    mData.add(map);
+                }
+                c.close();
+
+                SimpleAdapter adapter = new SimpleAdapter(this, mData, android.R.layout.simple_list_item_2, new String[] {"name", "phone"}, new int[] {android.R.id.text1, android.R.id.text2});
+                mListView.setAdapter(adapter);
         }
     }
 
     @Override
-    public void onRequestPermissionsResult(int req, String[] permissions, int[] grantResults) {
-        if(req == PERMISSIONS_REQUEST_READ_CONTRACTS) {
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                showContacts();
-            }
-            else {
-                Toast.makeText(this, "Fuck you", Toast.LENGTH_LONG).show();
-            }
-        }
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        Iterator iterator = mData.get(i).entrySet().iterator();
+        Map.Entry entry = (Map.Entry)iterator.next();
+        Toast.makeText(this, "key : " + entry.getKey().toString() + ", value : " + entry.getValue().toString(), Toast.LENGTH_LONG).show();
+        sendSMS(entry.getValue().toString(), SEND_MESSAGE);
     }
 
-    private List<String> getContactNames() {
-        List<String> contacts = new ArrayList<>();
+    public void sendSMS(String message, String number) {
+        PendingIntent sentIntent = PendingIntent.getBroadcast(this, 0, new Intent("SMS_SENT_ACTION"), 0);
+        PendingIntent deliveredIntent = PendingIntent.getBroadcast(this, 0, new Intent("SMS_DELIVERED_ACTION"), 0);
 
-        ContentResolver cr = getContentResolver();
-        Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                switch(getResultCode()){
+                    case Activity.RESULT_OK:
+                        // 전송 성공
+                        Toast.makeText(mContext, "전송 완료", Toast.LENGTH_SHORT).show();
+                        break;
+                    case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+                        // 전송 실패
+                        Toast.makeText(mContext, "전송 실패", Toast.LENGTH_SHORT).show();
+                        break;
+                    case SmsManager.RESULT_ERROR_NO_SERVICE:
+                        // 서비스 지역 아님
+                        Toast.makeText(mContext, "서비스 지역이 아닙니다", Toast.LENGTH_SHORT).show();
+                        break;
+                    case SmsManager.RESULT_ERROR_RADIO_OFF:
+                        // 무선 꺼짐
+                        Toast.makeText(mContext, "무선(Radio)가 꺼져있습니다", Toast.LENGTH_SHORT).show();
+                        break;
+                    case SmsManager.RESULT_ERROR_NULL_PDU:
+                        // PDU 실패
+                        Toast.makeText(mContext, "PDU Null", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        }, new IntentFilter("SMS_SENT_ACTION"));
 
-        if(cursor.moveToFirst()) {
-            do {
-                String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                contacts.add(name);
-            } while(cursor.moveToNext());
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                switch (getResultCode()){
+                    case Activity.RESULT_OK:
+                        // 도착 완료
+                        Toast.makeText(mContext, "SMS 도착 완료", Toast.LENGTH_SHORT).show();
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        // 도착 안됨
+                        Toast.makeText(mContext, "SMS 도착 실패", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        }, new IntentFilter("SMS_DELIVERED_ACTION"));
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED
+                                                            && checkSelfPermission(Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED
+                                                            && checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[] {Manifest.permission.SEND_SMS, Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_PHONE_STATE}, PERMISSION_SMS);
         }
-        cursor.close();
-
-        return contacts;
+        else {
+            SmsManager mSmsManager = SmsManager.getDefault();
+            mSmsManager.sendTextMessage(message, null, number, sentIntent, deliveredIntent);
+        }
     }
 }
