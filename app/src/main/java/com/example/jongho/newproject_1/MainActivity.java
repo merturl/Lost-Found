@@ -316,7 +316,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 markerOptions.title("Current Position" + latLng.latitude + "/" + latLng.longitude);
                 markerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_redmarker));
                 currentMarker = googleMap.addMarker(markerOptions);
+                display();
                 //Marker trace to camera
+//                display();
                 googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
             }
         };
@@ -345,7 +347,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             } else {
                 //currentLocations update time(interval time)
                 mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
-                display();
+//                display();
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -631,7 +633,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             locationMarker.setLongitude(item.getLng());
                             current.setLatitude(currentMarker.getPosition().latitude);
                             current.setLongitude(currentMarker.getPosition().longitude);
-                            Log.d("haha", String.valueOf(currentMarker.getPosition().latitude));
+                            Log.d("haha", "display"+String.valueOf(currentMarker.getPosition().latitude));
 
                             float distance = locationMarker.distanceTo(current);    // m 단위
 
@@ -721,6 +723,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GeofencingRequest getGeofencingRequest(List<Zone> zonelist) {
 
         Collections.sort(zonelist, new CompareDistanceAsc());
+
         for(Zone zone : zonelist ) {
             mapCircle = googleMap.addCircle(new CircleOptions().center(new LatLng(zone.getLatlng().latitude, zone.getLatlng().longitude))
                     .radius(CIRCLE_BOUND)
@@ -729,12 +732,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             mGeofenceList.add(new Geofence.Builder()
                     .setRequestId(zone.getRef())
                     .setCircularRegion(zone.getLatlng().latitude, zone.getLatlng().longitude, CIRCLE_BOUND)
-                    .setExpirationDuration(360000)
+                    .setExpirationDuration(Geofence.NEVER_EXPIRE)
                     .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT).build());    // 지오펜스 발생 시점
         }
 
         GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
-        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_DWELL);
+        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_EXIT);
         builder.addGeofences(mGeofenceList);
         return builder.build();
     }
