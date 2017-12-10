@@ -93,19 +93,22 @@ public class ItemViewActivity extends AppCompatActivity {
                 content.setText(item.getContent());
                 time.setText(item.getTime());
 
-
-
                 // Load the image using Glide
                 Glide.with(ItemViewActivity.this)
                         .using(new FirebaseImageLoader())
                         .load(storageReference)
                         .into(imgView);
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // ...
             }
         });
+    }
+
+    public void EditItem(View view) {
+
     }
 
 
