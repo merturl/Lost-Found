@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 if(mBound){
                     try{
-                        Toast.makeText(getApplicationContext(), mService.add(11,22)+","+ mService.sub(5,9),Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getApplicationContext(), mService.add(11,22)+","+ mService.sub(5,9),Toast.LENGTH_SHORT).show();
                         Log.i("haha", "/"+mService.add(11,22));
                     }catch (RemoteException e){
 
@@ -202,7 +202,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         Toast.makeText(MainActivity.this, "해당 주소정보 없음", Toast.LENGTH_SHORT).show();
                     } else {
 
-                        Toast.makeText(MainActivity.this, String.valueOf(list.get(0).getLatitude()) + ", " + String.valueOf(list.get(0).getLongitude()), Toast.LENGTH_LONG).show();
                         googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(list.get(0).getLatitude(), list.get(0).getLongitude())));
                         v.put("addr", addr.getText().toString());
                         v.put("lat", list.get(0).getLatitude());
@@ -545,9 +544,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     HashMap<String, Object> tag;
                     tag = (HashMap) marker.getTag();
 
-                    Toast.makeText(MainActivity.this, "tag uid="+tag.get("Uid"), Toast.LENGTH_LONG).show();
-                    Toast.makeText(MainActivity.this, "my uid="+mFirebaseAuth.getCurrentUser().getUid(), Toast.LENGTH_LONG).show();
-
                     // 내가 생성한 마커면 수정, 아니면 읽기만 가능
                     Log.d("uid", "uid=="+tag.get("Uid"));
                     if(tag.get("Uid") == mFirebaseAuth.getCurrentUser().getUid()){
@@ -587,7 +583,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapClick(LatLng latLng) {
         Point clickPoint = this.googleMap.getProjection().toScreenLocation(latLng);
         LatLng point = this.googleMap.getProjection().fromScreenLocation(clickPoint);
-        Toast.makeText(this, "Click Point Lat : " + point.latitude + " Lon : " + point.longitude, Toast.LENGTH_LONG).show();
 
         // getItemActivity 전환 인텐트
         Intent intent = new Intent(this, TypeActivity.class);
