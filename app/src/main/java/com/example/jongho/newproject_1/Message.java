@@ -8,6 +8,7 @@ public class Message {
     private String to;
     private String from;
     private String msg;
+    private boolean send;
 
     public Message() {
 
@@ -17,6 +18,7 @@ public class Message {
         this.to =to;
         this.from=from;
         this.msg =msg;
+        this.send = true;
     }
 
     public String getTo() {
@@ -41,6 +43,14 @@ public class Message {
 
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+
+    public boolean isSend() {
+        return send;
+    }
+
+    public void setSend(boolean send) {
+        this.send = send;
     }
 
 }

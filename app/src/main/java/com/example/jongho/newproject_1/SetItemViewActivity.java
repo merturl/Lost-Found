@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.sql.Ref;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class SetItemViewActivity extends AppCompatActivity {
     // Firebase 객체 생성
@@ -57,16 +58,6 @@ public class SetItemViewActivity extends AppCompatActivity {
         Log.d("acac", "onCreate");
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
 
         //외부 저장소 사진 읽기, 쓰기 권한 체크
         checkPerssions();
@@ -86,10 +77,11 @@ public class SetItemViewActivity extends AppCompatActivity {
         Intent getintent = getIntent();
         final String DbRef = getintent.getStringExtra("DbRef");
         final String ImageRef = getintent.getStringExtra("ImageRef");
-        Log.d("DB", "ImageRef===" + ImageRef);
+
+
 
         mFireDB.getReference(DbRef)
-                .addValueEventListener(new ValueEventListener() {
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         mStorageRef = FirebaseStorage.getInstance().getReference();
@@ -97,6 +89,10 @@ public class SetItemViewActivity extends AppCompatActivity {
                         Log.d("acac", "addValueEventListener"+ storageReference);
 
                         Item item = dataSnapshot.getValue(Item.class);
+                        if(  item.getTitle().matches("") ) {
+                            finish();
+                        }
+
 
                         EditText title = (EditText) findViewById(R.id.edit_ItemTitle);
                         EditText content = (EditText) findViewById(R.id.edit_ItemContent);
@@ -104,7 +100,6 @@ public class SetItemViewActivity extends AppCompatActivity {
                         ImageView imgview = (ImageView)findViewById(R.id.imgv_setitem);
 
                         // text Item
-                        Log.d("haha","item.getTitle() === " + item.getTitle());
                         title.setText(item.getTitle());
                         content.setText(item.getContent());
                         time.setText(item.getTime());
@@ -132,21 +127,22 @@ public class SetItemViewActivity extends AppCompatActivity {
 
     public void EditItem(final String Ref, final String ImageRef, final Item item) {
         Log.d("acac", "///////////In EditItem ///////// ");
-        Log.d("acac", "DbRef == "+ Ref);
-        Log.d("acac", "ImageRef == "+ ImageRef);
-        Log.d("acac", "Item.getTitle() == "+ item.getTitle());
+        Log.d("acac", "DbRef == " + Ref);
+        Log.d("acac", "ImageRef == " + ImageRef);
+        Log.d("acac", "Item.getTitle() == " + item.getTitle());
 
         final EditText etitle = (EditText) findViewById(R.id.edit_ItemTitle);
         final EditText econtent = (EditText) findViewById(R.id.edit_ItemContent);
         final EditText etime = (EditText) findViewById(R.id.edit_ItemTime);
-        ImageView imgView = (ImageView)findViewById(R.id.imgv_setitem);
-        Button BtnEdit = (Button)findViewById(R.id.btn_edit);
+        ImageView imgView = (ImageView) findViewById(R.id.imgv_setitem);
+        Button BtnEdit = (Button) findViewById(R.id.btn_edit);
+
 
 //        final String title = etitle.getText().toString();
 //        final String content = econtent.getText().toString();
 //        final String time = etime.getText().toString();
 
-        Log.d("acac", "item.getTitle == "+ item.getTitle());
+        Log.d("acac", "item.getTitle == " + item.getTitle());
 
         // 저장 버튼 클릭시
         BtnEdit.setOnClickListener(new View.OnClickListener() {
@@ -159,8 +155,8 @@ public class SetItemViewActivity extends AppCompatActivity {
                 EditText time = (EditText) findViewById(R.id.edit_ItemTime);
 
                 Log.d("acac", "/////onClick///////");
-                Log.d("acac","item.title=="+item.getTitle());
-                Log.d("acac","Ref====="+Ref);
+                Log.d("acac", "item.title==" + item.getTitle());
+                Log.d("acac", "Ref=====" + Ref);
 
                 Map<String, Object> itemUpdates = new HashMap<String, Object>();
                 itemUpdates.put("title", title.getText().toString());
@@ -169,33 +165,21 @@ public class SetItemViewActivity extends AppCompatActivity {
 
                 // 아이템 저장
                 DatabaseReference mFireRef = mFireDB.getReference(Ref);
-                Log.d("acac","mFireRef"+mFireRef.toString());
-                Log.d("acac","Item====="+item.getTitle());
                 mFireRef.updateChildren(itemUpdates);
-                try{
-//                    mFireRef.setValue(new Item(item.getType(), item.getLat(), item.getLng(), title, content, time));
-                } catch (Exception e) {
-                    Log.d("acac","exception e = "+Ref);
-                    e.printStackTrace();
-                }
-
-//                String postId = mFireRef.getKey();
-
-
 
                 // 이미지 저장
                 StorageReference reference = mStorageRef.child(ImageRef);
-                Log.d("acac== ","reference"+reference);
+                Log.d("acac", "reference" + reference);
                 //파이어베이스에 쓰이는 데이터로 이미지 변환
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                Log.d("acac","baos== "+baos);
+                Log.d("acac", "baos== " + baos);
                 try {
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                } catch ( NullPointerException e ) {
+                } catch (NullPointerException e) {
                     return;
                 }
                 byte[] data = baos.toByteArray();
-                Log.d("acac","data== "+data);
+                Log.d("acac", "data== " + data);
 
                 UploadTask uploadTask = reference.putBytes(data);
                 uploadTask.addOnFailureListener(new OnFailureListener() {
@@ -208,10 +192,10 @@ public class SetItemViewActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                Uri downloadUrl = taskSnapshot.getDownloadUrl(); //이미지가 저장된 주소의 URL
+                        Uri downloadUrl = taskSnapshot.getDownloadUrl(); //이미지가 저장된 주소의 URL
 
-                        Log.d("acac","onSucess== "+ item.getTitle());
-                        Log.d("DB","success listiner"+item.getContent());
+                        Log.d("acac", "onSucess== " + item.getTitle());
+                        Log.d("DB", "success listiner" + item.getContent());
 //                        uploadImage(ImageRef);
                         Toast.makeText(SetItemViewActivity.this, "이미지 저장 성공", Toast.LENGTH_SHORT).show();
                         finish();
@@ -219,8 +203,37 @@ public class SetItemViewActivity extends AppCompatActivity {
                 });
             }
         });
+
     }
-//
+
+    public void Itemdelete(View v){
+        Intent getintent = getIntent();
+        String DbRef = getintent.getStringExtra("DbRef");
+        String ImageRef = getintent.getStringExtra("ImageRef");
+        Log.d("acac", "in delete ImageRef= "+ImageRef);
+        Log.d("acac","ImageRef== " + ImageRef);
+//        Toast.makeText(this, "ImageRef=="+ImageRef, Toast.LENGTH_LONG).show();
+
+        DatabaseReference mFireRef = mFireDB.getReference(DbRef);
+        mFireRef.removeValue();
+
+        StorageReference reference = mStorageRef.child(ImageRef+".jpeg");
+        reference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d("acac", "onSuccess: delete ");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("acac","onFailure:"+ e.getMessage());
+            }
+        });
+
+        finish();
+    }
+
+
     //파이어스토어에 이미지 저장
     public void uploadImage(final String ImageRef){
         Log.d("DB","uploadImage start");
