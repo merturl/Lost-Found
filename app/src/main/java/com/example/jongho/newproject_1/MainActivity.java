@@ -491,6 +491,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             startLocationPermissionRequest(REQUEST_PERMISSIONS_MYLOCATION_CODE);
             return;
         }
+
         this.googleMap.setMyLocationEnabled(true);
         this.googleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
             @Override
@@ -533,6 +534,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         });
+
         this.googleMap.setOnMapClickListener(this);
     }
 
@@ -548,7 +550,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         intent.putExtra("lng", point.longitude);
         startActivity(intent);
         overridePendingTransition(R.anim.anim_slide_in_right, R.anim.anim_slide_out_left);
-
     }
 
     // Firebase 변화 수신
@@ -619,20 +620,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                         requestPermissions(REQUEST_PERMISSIONS_LAST_LOCATION_REQUEST_CODE);
                                         return;
                                     }
-
-                                    if (currentLocation != null) {
-                                        Log.d("haha", "addgeofence" + currentLocation.getLongitude() + "+" + currentLocation.getLatitude());
-                                        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                            // TODO: Consider calling
-                                            //    ActivityCompat#requestPermissions
-                                            // here to request the missing permissions, and then overriding
-                                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                            //                                          int[] grantResults)
-                                            // to handle the case where the user grants the permission. See the documentation
-                                            // for ActivityCompat#requestPermissions for more details.
-                                            requestPermissions(REQUEST_PERMISSIONS_LAST_LOCATION_REQUEST_CODE);
-                                            return;
-                                        }
                                         if (zonelist.size() > 0) {
                                             geofencingClient.addGeofences(getGeofencingRequest(zonelist), getGeofencePendingIntent()).addOnSuccessListener(MainActivity.this, new OnSuccessListener<Void>() {
                                                 @Override
@@ -650,7 +637,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 }
                             }
                         }
-                    }
                     // 아이템 변화가 있을 때 수신
                     @Override
                     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
