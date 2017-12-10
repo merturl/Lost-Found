@@ -258,6 +258,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder iBinder) {
+            Log.d("haha", "Hello");
             mService = IMyAidlInterface.Stub.asInterface(iBinder);
             mBound = true;
         }
@@ -265,6 +266,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            Log.d("haha", "Hello1");
             mService = null;
             mBound = false;
         }
