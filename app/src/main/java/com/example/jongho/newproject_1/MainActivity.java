@@ -544,18 +544,37 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     HashMap<String, Object> tag;
                     tag = (HashMap) marker.getTag();
 
+//                    //테스트용 to ItemViewActivity
+//                    Intent ItemView = new Intent(MainActivity.this, ItemViewActivity.class);
+//                    ItemView.putExtra("DbRef", tag.get("DbRef").toString());
+//                    ItemView.putExtra("ImageRef", tag.get("ImageRef").toString());
+//                    ItemView.putExtra("Uid", tag.get("Uid").toString());
+//                    ItemView.putExtra("MarkerId", tag.get("MarkerId").toString());
+//                    Log.d("acac", "Uid="+tag.get("Uid").toString());
+//                    Log.d("acac", "MarkerId="+tag.get("MarkerId").toString());
+//                    startActivity(ItemView);
+//                    return true;
+
                     // 내가 생성한 마커면 수정, 아니면 읽기만 가능
                     Log.d("uid", "uid=="+tag.get("Uid"));
                     if(tag.get("Uid") == mFirebaseAuth.getCurrentUser().getUid()){
                         Intent SetItemView = new Intent(MainActivity.this, SetItemViewActivity.class);
                         SetItemView.putExtra("DbRef", tag.get("DbRef").toString());
                         SetItemView.putExtra("ImageRef", tag.get("ImageRef").toString());
+                        SetItemView.putExtra("Uid", tag.get("Uid").toString());
+                        SetItemView.putExtra("MarkerId", tag.get("MarkerId").toString());
+                        Log.d("acac", "Uid="+tag.get("Uid").toString());
+                        Log.d("acac", "MarkerId="+tag.get("MarkerId").toString());
                         startActivity(SetItemView);
                         return true;
                     } else {
                         Intent ItemView = new Intent(MainActivity.this, ItemViewActivity.class);
                         ItemView.putExtra("DbRef", tag.get("DbRef").toString());
                         ItemView.putExtra("ImageRef", tag.get("ImageRef").toString());
+                        ItemView.putExtra("Uid", tag.get("Uid").toString());
+                        ItemView.putExtra("MarkerId", tag.get("MarkerId").toString());
+                        Log.d("acac", "Uid="+tag.get("Uid").toString());
+                        Log.d("acac", "MarkerId="+tag.get("MarkerId").toString());
                         startActivity(ItemView);
                         return true;
                     }
@@ -638,6 +657,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             tag.put("DbRef", "Item/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + itemSnapshot.getKey());
                             tag.put("ImageRef", "Item/image/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + itemSnapshot.getKey());
                             tag.put("Uid",mFirebaseAuth.getCurrentUser().getUid());
+                            tag.put("MarkerId", itemSnapshot.getKey());
                             tag.put("distance", distance);
                             addMarker.setTag(tag);
 

@@ -93,18 +93,19 @@
         <activity
             android:name=".SetItemViewActivity"
             android:label="@string/title_activity_set_item_view"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".ContractsActivity"/>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ContractsActivity" />
 
         <receiver
             android:name=".SMSBroadcast"
             android:enabled="true"
             android:exported="true">
-
             <intent-filter android:priority="9999">
-                <action android:name="android.provider.Telephony.SMS_RECIVED"/>
+                <action android:name="android.provider.Telephony.SMS_RECIVED" />
             </intent-filter>
         </receiver>
+
+        <activity android:name=".MsgActivity"></activity>
     </application>
 
 </manifest>

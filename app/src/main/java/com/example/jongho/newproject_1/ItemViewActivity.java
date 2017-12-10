@@ -44,20 +44,29 @@ public class ItemViewActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // intent 받아오기
+        Intent getintent = getIntent();
+
+        String DbRef = getintent.getStringExtra("DbRef");
+        final String ImageRef = getintent.getStringExtra("ImageRef");
+        final String uid = getintent.getStringExtra("Uid");
+        Log.d("acac","Uid="+uid);
+        final String markerid= getintent.getStringExtra("MarkerId");
+        Log.d("acac","MarkerId="+markerid);
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+
+                Intent intent = new Intent(ItemViewActivity.this,MsgActivity.class);
+                intent.putExtra("toUid",uid);
+                intent.putExtra("MarkerId",markerid);
+                startActivity(intent);
             }
         });
-
-        // intent 받아오기
-        Intent getintent = getIntent();
-
-        String DbRef = getintent.getStringExtra("DbRef");
-        final String ImageRef = getintent.getStringExtra("ImageRef");
 
         mFireDB.getReference(DbRef)
                 .addListenerForSingleValueEvent(new ValueEventListener() {

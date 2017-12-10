@@ -102,7 +102,7 @@ public class LostItemActivity extends AppCompatActivity {
             String time = edittime.getText().toString();
 
             // 아이템 저장 lat, lng,  title, content, time
-            Item saveitem = new Item(true, lat, lng, title, content);
+            Item saveitem = new Item(false, lat, lng, title, content);
             DatabaseReference mFireRef = mFireDB.getReference("Item/"+mFirebaseAuth.getCurrentUser().getUid()).push();
             mFireRef.setValue(saveitem);
             String postId = mFireRef.getKey();
