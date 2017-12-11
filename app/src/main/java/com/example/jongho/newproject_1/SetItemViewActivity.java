@@ -422,7 +422,6 @@ public class SetItemViewActivity extends AppCompatActivity {
         Log.d("acac", "/////////onActivityResult/////////");
 
         if(requestCode ==1 ){
-
             if ( data == null) {
                 Toast.makeText(this, "Sorry, Don't find image", Toast.LENGTH_SHORT).show();
             } else {

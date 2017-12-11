@@ -167,9 +167,7 @@ public class getItemActivity extends AppCompatActivity
             edittime.setText("");
         }
 
-        finish();
-        // 화면전환 애니메이션 효과
-       overridePendingTransition(R.anim.anim_slide_in_left,R.anim.anim_slide_out_right);
+
     }
 
 
@@ -267,6 +265,9 @@ public class getItemActivity extends AppCompatActivity
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
 //                Uri downloadUrl = taskSnapshot.getDownloadUrl(); //이미지가 저장된 주소의 URL
                 Toast.makeText(getItemActivity.this, "이미지 저장 성공", Toast.LENGTH_SHORT).show();
+                finish();
+                // 화면전환 애니메이션 효과
+                overridePendingTransition(R.anim.anim_slide_in_left,R.anim.anim_slide_out_right);
             }
         });
         Toast.makeText(getItemActivity.this, "return uri== " + getitemkey, Toast.LENGTH_LONG).show();

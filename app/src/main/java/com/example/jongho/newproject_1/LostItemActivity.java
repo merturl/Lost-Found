@@ -152,10 +152,6 @@ public class LostItemActivity extends AppCompatActivity {
             editcontent.setText("");
             edittime.setText("");
         }
-
-        finish();
-        // 화면전환 애니메이션 효과
-        overridePendingTransition(R.anim.anim_slide_in_left,R.anim.anim_slide_out_right);
     }
 
     //파이어스토어에 이미지 저장
@@ -190,6 +186,10 @@ public class LostItemActivity extends AppCompatActivity {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
 //                Uri downloadUrl = taskSnapshot.getDownloadUrl(); //이미지가 저장된 주소의 URL
                 Toast.makeText(LostItemActivity.this, "이미지 저장 성공", Toast.LENGTH_SHORT).show();
+
+                finish();
+                // 화면전환 애니메이션 효과
+                overridePendingTransition(R.anim.anim_slide_in_left,R.anim.anim_slide_out_right);
             }
         });
         Toast.makeText(LostItemActivity.this, "return uri== " + lostitemkey, Toast.LENGTH_LONG).show();
