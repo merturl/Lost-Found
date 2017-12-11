@@ -58,27 +58,34 @@ public class ContractsActivity extends AppCompatActivity implements View.OnClick
 
     @Override
     public void onClick(View view) {
+
         switch (view.getId()) {
             case R.id.addr:
                 mData = new ArrayList<Map<String, String>>();
-                Cursor c = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-
-                while(c.moveToNext()) {
-                    HashMap<String, String> map = new HashMap<String, String>();
-                    String id = c.getString(c.getColumnIndex(ContactsContract.Contacts._ID));
-                    String name = c.getString(c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY));
-                    map.put("name", name);
-                    Cursor phoneCursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + id,null, null);
-
-                    if (phoneCursor.moveToFirst()) {
-                        String number = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                        map.put("phone", number);
-                    }
-
-                    phoneCursor.close();
-                    mData.add(map);
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED
+                        && checkSelfPermission(Manifest.permission.WRITE_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[] {Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS}, PERMISSION_SMS);
                 }
-                c.close();
+                else {
+                    Cursor c = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+
+                    while(c.moveToNext()) {
+                        HashMap<String, String> map = new HashMap<String, String>();
+                        String id = c.getString(c.getColumnIndex(ContactsContract.Contacts._ID));
+                        String name = c.getString(c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY));
+                        map.put("name", name);
+                        Cursor phoneCursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + id,null, null);
+
+                        if (phoneCursor.moveToFirst()) {
+                            String number = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                            map.put("phone", number);
+                        }
+
+                        phoneCursor.close();
+                        mData.add(map);
+                    }
+                    c.close();
+                }
 
                 SimpleAdapter adapter = new SimpleAdapter(this, mData, android.R.layout.simple_list_item_2, new String[] {"name", "phone"}, new int[] {android.R.id.text1, android.R.id.text2});
                 mListView.setAdapter(adapter);

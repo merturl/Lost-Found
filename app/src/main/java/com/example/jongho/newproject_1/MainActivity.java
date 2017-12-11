@@ -2,6 +2,7 @@ package com.example.jongho.newproject_1;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -20,6 +21,9 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -121,6 +125,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //For search activity
     private Intent search;
 
+    //For ContractsActivity
+    private Intent contracts;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         geofencingClient = LocationServices.getGeofencingClient(this);
         mGeofenceList = new ArrayList<Geofence>();
         search = new Intent(this, SearchActivity.class);
+        contracts = new Intent(this, ContractsActivity.class);
 
         //checkforlocation
         checkForLocationRequest();
@@ -146,7 +154,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.option_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> info = am.getRunningTasks(1);
+        Log.e("SEX", info.get(0).topActivity.getClassName());
+
+        switch (item.getItemId()) {
+            case R.id.contractActivity:
+                startActivity(contracts);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
 
