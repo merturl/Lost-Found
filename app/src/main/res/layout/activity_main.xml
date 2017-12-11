@@ -52,7 +52,9 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="검색" />
+            android:text="검색"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/cast_expanded_controller_background_color"/>
 
     </LinearLayout>
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"

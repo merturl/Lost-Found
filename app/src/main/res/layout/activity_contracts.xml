@@ -7,7 +7,10 @@
         android:id="@+id/addr"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Address" />
+        android:text="Address"
+        android:textColor="@color/white"
+        android:backgroundTint="@color/cast_expanded_controller_background_color"
+        />
 
     <ListView
         android:id="@+id/listView"

@@ -79,7 +79,9 @@
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/edit_Gettime"
-            tools:ignore="MissingConstraints" />
+            tools:ignore="MissingConstraints"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/cast_expanded_controller_background_color"/>
 
 
     </LinearLayout>
