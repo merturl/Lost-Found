@@ -11,7 +11,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 
-public class ToturialActivity extends AppCompatActivity {
+public class TutorialActivity extends AppCompatActivity {
 
     private WebView myWebView;
     private FrameLayout customViewContainer;
@@ -20,7 +20,7 @@ public class ToturialActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_toturial);
+        setContentView(R.layout.activity_tutorial);
 
         myWebView = findViewById(R.id.myWebView);
         customViewContainer = findViewById(R.id.customView_frame);
@@ -28,7 +28,7 @@ public class ToturialActivity extends AppCompatActivity {
         settings.setJavaScriptEnabled(true);
         settings.setAppCacheEnabled(true);
         myWebView.setWebChromeClient(new CustomWebChromeClient());
-        myWebView.loadUrl("https://youtu.be/6b7-Npk56Ds");
+        myWebView.loadUrl("https://www.youtube.com/watch?v=EiFFcj6OUEI");
     }
 
     class CustomWebChromeClient extends WebChromeClient {

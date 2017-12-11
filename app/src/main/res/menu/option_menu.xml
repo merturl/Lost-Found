@@ -3,5 +3,8 @@
     <item
         android:id="@+id/contractActivity"
         android:title="Contract"/>
+    <item
+        android:id="@+id/tutorialActivitiy"
+        android:title="Tutorial"/>
 
 </menu>

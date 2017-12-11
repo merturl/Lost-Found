@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/main_frame"
-    tools:context="com.example.jongho.newproject_1.ToturialActivity">
+    tools:context="com.example.jongho.newproject_1.TutorialActivity">
     <WebView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"

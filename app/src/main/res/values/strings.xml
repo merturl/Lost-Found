@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">NewProject_1</string>
+    <string name="app_name">찾아주세요</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_get_item">getItem</string>
 

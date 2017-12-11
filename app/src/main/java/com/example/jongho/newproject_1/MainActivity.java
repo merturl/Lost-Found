@@ -129,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     //For ContractsActivity
     private Intent contracts;
+    private Intent tutorial;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -143,6 +144,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mGeofenceList = new ArrayList<Geofence>();
         search = new Intent(this, SearchActivity.class);
         contracts = new Intent(this, ContractsActivity.class);
+        tutorial = new Intent(this, TutorialActivity.class);
 
         //checkforlocation
         checkForLocationRequest();
@@ -169,14 +171,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public boolean onOptionsItemSelected(MenuItem item) {
         ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         List<ActivityManager.RunningTaskInfo> info = am.getRunningTasks(1);
-        Log.e("SEX", info.get(0).topActivity.getClassName());
 
         switch (item.getItemId()) {
             case R.id.contractActivity:
                 startActivity(contracts);
                 return true;
-            case R.id.tutorial:
-                startActivity(contracts);
+            case R.id.tutorialActivitiy:
+                startActivity(tutorial);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -441,13 +442,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             callCurrentLocation();
                         } else {
                             showSnackbar();
-                            callCurrentLocation();
+//                            callCurrentLocation();
                         }
                     }
                 });
-        if(currentLocation  == null){
-
-        }
+//        if(currentLocation  == null){
+//
+//        }
     }
 
     //Toast msg
