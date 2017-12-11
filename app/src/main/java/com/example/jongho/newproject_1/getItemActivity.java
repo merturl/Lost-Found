@@ -54,18 +54,12 @@ public class getItemActivity extends AppCompatActivity
     private FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase mFireDB = FirebaseDatabase.getInstance();
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_get_item);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-
-
-
-
 
 
         //외부 저장소 사진 읽기, 쓰기 권한 체크
@@ -83,8 +77,6 @@ public class getItemActivity extends AppCompatActivity
                 startActivityForResult(intent, 1);
             }
         });
-
-
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -106,31 +98,36 @@ public class getItemActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-    @Override
-    protected void onStart() {
+
+    public void onStart() {
         super.onStart();
 
+        // SharedPreferences 사용
         SharedPreferences sharedPreferences = getSharedPreferences("prefItemData", MODE_PRIVATE);
 
         edittitle = (EditText)findViewById(R.id.edit_Gettitle);
-        edittitle.setText(sharedPreferences.getString("title", ""));
-
+        edittitle.setText(sharedPreferences.getString("edit_Gettitle", ""));
         editcontent = (EditText)findViewById(R.id.edit_Getcontent);
-        editcontent.setText(sharedPreferences.getString("content", ""));
-
+        editcontent.setText(sharedPreferences.getString("edit_Getcontent", ""));
         edittime = (EditText)findViewById(R.id.edit_Gettime);
-        edittime.setText(sharedPreferences.getString("time", ""));
+        edittime.setText(sharedPreferences.getString("edit_Gettime",""));
     }
 
-    @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
+
+        // SharedPreferences 사용
+        edittitle = (EditText)findViewById(R.id.edit_Gettitle);
+        editcontent = (EditText)findViewById(R.id.edit_Getcontent);
+        edittime = (EditText)findViewById(R.id.edit_Gettime);
 
         SharedPreferences sharedPreferences = getSharedPreferences("prefItemData", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("title", edittitle.getText().toString());
-        editor.putString("content", editcontent.getText().toString());
-        editor.putString("time", edittime.getText().toString());
+
+        editor.putString("edit_Gettitle", edittitle.getText().toString());
+        editor.putString("edit_Getcontent", editcontent.getText().toString());
+        editor.putString("edit_Gettime", edittime.getText().toString());
+
         editor.commit();
     }
 
@@ -171,9 +168,7 @@ public class getItemActivity extends AppCompatActivity
             edittime.setText("");
         }
 
-        finish();
-        // 화면전환 애니메이션 효과
-       overridePendingTransition(R.anim.anim_slide_in_left,R.anim.anim_slide_out_right);
+
     }
 
 
@@ -271,6 +266,9 @@ public class getItemActivity extends AppCompatActivity
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
 //                Uri downloadUrl = taskSnapshot.getDownloadUrl(); //이미지가 저장된 주소의 URL
                 Toast.makeText(getItemActivity.this, "이미지 저장 성공", Toast.LENGTH_SHORT).show();
+                finish();
+                // 화면전환 애니메이션 효과
+                overridePendingTransition(R.anim.anim_slide_in_left,R.anim.anim_slide_out_right);
             }
         });
         Toast.makeText(getItemActivity.this, "return uri== " + getitemkey, Toast.LENGTH_LONG).show();
