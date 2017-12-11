@@ -175,6 +175,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             case R.id.contractActivity:
                 startActivity(contracts);
                 return true;
+            case R.id.tutorial:
+                startActivity(contracts);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -438,6 +441,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             callCurrentLocation();
                         } else {
                             showSnackbar();
+                            callCurrentLocation();
                         }
                     }
                 });
