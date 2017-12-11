@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     List<Zone> zonelist = new ArrayList<>();
     protected ArrayList<Geofence> mGeofenceList;
+    static List<Circle> mCircleList;
 
     Circle mapCircle;
 
@@ -370,6 +371,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 markerOptions.position(latLng);
                 markerOptions.title("Current Position" + latLng.latitude + "/" + latLng.longitude);
                 markerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_redmarker));
+                googleMap.clear();
+                deleteCircles();
                 currentMarker = googleMap.addMarker(markerOptions);
                 display();
 //                display();
@@ -780,17 +783,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             Toast.makeText(this, "Are you exit?", Toast.LENGTH_SHORT).show();
         }
     }
-
+    public void deleteCircles(){
+        if(mCircleList != null) {
+            for (int i = 0; i <= mCircleList.size() - 1; i++) {
+                Log.d("haha", "deleteCircles");
+                mCircleList.get(i).remove();
+            }
+            mCircleList.clear();
+        }
+    }
     // GooglePlayService에 지오 펜스 요청
     private GeofencingRequest getGeofencingRequest(List<Zone> zonelist) {
-
+        if (mCircleList==null){
+            mCircleList = new ArrayList<>();
+        }
         Collections.sort(zonelist, new CompareDistanceAsc());
-
         for(Zone zone : zonelist ) {
             mapCircle = googleMap.addCircle(new CircleOptions().center(new LatLng(zone.getLatlng().latitude, zone.getLatlng().longitude))
                     .radius(CIRCLE_BOUND)
                     .strokeColor(Color.parseColor("#884169e1"))
                     .fillColor(Color.parseColor("#5587cefa")));
+            mCircleList.add(mapCircle);
             mGeofenceList.add(new Geofence.Builder()
                     .setRequestId(zone.getRef())
                     .setCircularRegion(zone.getLatlng().latitude, zone.getLatlng().longitude, CIRCLE_BOUND)
