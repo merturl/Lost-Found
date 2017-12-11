@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Cursor mCursor;
     private ContentValues v = new ContentValues();
 
-    List<Zone> zonelist = new ArrayList<>();
+
     protected ArrayList<Geofence> mGeofenceList;
     static List<Circle> mCircleList;
 
@@ -121,6 +121,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // If Activity exit
     private final long FINISH_INTERVAL_TIME = 2000;
     private long backPressedTime = 0;
+    List<Zone> zonelist;
 
 
     //For search activity
@@ -665,6 +666,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.i(TAG, "display");
         Log.i("haha", "display");
         // Item 수신
+        if(zonelist != null){
+            zonelist.clear();
+        }else{
+            zonelist = new ArrayList<>();
+        }
         mFireDB.getReference("Item")
                 .addChildEventListener(new ChildEventListener() {
                     // 리스트의 아이템을 검색하거나 아이템 추가가 있을 때 수신
