@@ -1,11 +1,8 @@
 package com.example.jongho.newproject_1;
 
 import android.app.Activity;
-import android.app.ListActivity;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -17,14 +14,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.LatLng;
-
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -63,7 +55,7 @@ public class SearchActivity extends AppCompatActivity {
                 Iterator iterator = mList.get(i).entrySet().iterator();
                 while (iterator.hasNext()) {
                     Map.Entry entry = (Map.Entry)iterator.next();
-                    Log.e("SEXSEXSEX", "Key : " + entry.getKey() + ", Value : " + entry.getValue());
+                    Log.e("haha", "Key : " + entry.getKey() + ", Value : " + entry.getValue());
                     if(entry.getKey().equals("addr")) {
                         intent.putExtra("addr", entry.getValue().toString());
                     }
@@ -97,14 +89,15 @@ public class SearchActivity extends AppCompatActivity {
                         Toast.makeText(SearchActivity.this, "해당 주소정보 없음", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(SearchActivity.this, String.valueOf(list.get(0).getLatitude()) + ", " + String.valueOf(list.get(0).getLongitude() + "OK?"), Toast.LENGTH_LONG).show();
+                        intent.putExtra("lat", list.get(0).getLatitude());
+                        intent.putExtra("lon", list.get(0).getLongitude());
+                        intent.putExtra("addr", search.getText().toString());
                     }
                 }
 
-                intent.putExtra("lat", list.get(0).getLatitude());
-                intent.putExtra("lon", list.get(0).getLongitude());
-                intent.putExtra("addr", search.getText().toString());
                 setResult(Activity.RESULT_OK, intent);
                 finish();
+
             }
         });
     }

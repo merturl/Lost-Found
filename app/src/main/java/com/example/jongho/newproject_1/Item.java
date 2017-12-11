@@ -15,29 +15,45 @@ public class Item {
     private String title;
     private String content;
     private String time;
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+//    public boolean isType() {
+//        return type;
+//    }
+
+    private String uid;
     private boolean type;   // getItem: T, lostItem: F
 
     // 생성자
     public Item() { }
 
     // lat, lng, title, content, time
-    public Item(boolean type, double lat, double lng, String title, String content, String time) {
+    public Item(boolean type, double lat, double lng, String title, String content, String time, String uid) {
         this.type = type;
         this.lat = lat;
         this.lng = lng;
         this.title = title;
         this.content = content;
         this.time = time;
+        this.uid = uid;
     }
 
     // 시간을 입력안했을 때 default로 현재 시각
-    public Item(boolean type, double lat, double lng, String title, String content) {
+    public Item(boolean type, double lat, double lng, String title, String content, String uid) {
         this.type = type;
         this.lat = lat;
         this.lng = lng;
         this.title = title;
         this.content = content;
         this.time = new SimpleDateFormat("yyyy-MM-dd").format(new Date(System.currentTimeMillis()));
+        this.uid = uid;
     }
 
 

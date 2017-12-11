@@ -613,6 +613,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     // 내가 생성한 마커면 수정, 아니면 읽기만 가능
                     Log.d("uid", "uid=="+tag.get("Uid"));
+                    Log.d("uid", "muid=="+mFirebaseAuth.getCurrentUser().getUid());
                     if(tag.get("Uid") == mFirebaseAuth.getCurrentUser().getUid()){
                         Intent SetItemView = new Intent(MainActivity.this, SetItemViewActivity.class);
                         SetItemView.putExtra("DbRef", tag.get("DbRef").toString());
@@ -717,16 +718,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                             // 마커에 달 태그
                             HashMap<String, Object> tag = new HashMap<String, Object>();
-                            tag.put("DbRef", "Item/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + itemSnapshot.getKey());
-                            tag.put("ImageRef", "Item/image/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + itemSnapshot.getKey());
-                            tag.put("Uid",mFirebaseAuth.getCurrentUser().getUid());
+                            tag.put("DbRef", "Item/" + item.getUid() + "/" + itemSnapshot.getKey());
+                            tag.put("ImageRef", "Item/image/" + item.getUid() + "/" + itemSnapshot.getKey());
+                            tag.put("Uid",item.getUid());
                             tag.put("MarkerId", itemSnapshot.getKey());
                             tag.put("distance", distance);
                             addMarker.setTag(tag);
 
                             if (distance < 100) {
                                 Zone itemzone = new Zone();
-                                itemzone.setRef("item/" + mFirebaseAuth.getCurrentUser().getUid() + "/" + dataSnapshot.getKey());
+                                itemzone.setRef("item/" + item.getUid() + "/" + dataSnapshot.getKey());
                                 itemzone.setLatlng(new LatLng(item.getLat(), item.getLng()));
                                 itemzone.setDistance(distance);
                                 zonelist.add(itemzone);

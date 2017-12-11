@@ -95,7 +95,7 @@ public class SetItemViewActivity extends AppCompatActivity {
                         Log.d("pp", "storageRef="+storageReference);
 
                         Item item = dataSnapshot.getValue(Item.class);
-                        if(  item.getTitle().matches("") ) {
+                        if (item != null && item.getTitle().matches("")) {
                             finish();
                         }
 
