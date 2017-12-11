@@ -100,6 +100,8 @@ public class GeofenceTransitionsIntentService extends IntentService {
     }
 
     private void sendNotification(int transitiontype) {
+        String title = null;
+        String content = "메시지를 확인해주세요!";
         // Get an instance of the Notification manager
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -134,6 +136,20 @@ public class GeofenceTransitionsIntentService extends IntentService {
         // Get a notification builder that's compatible with platform versions >= 4
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
 
+        if(transitiontype == Geofence.GEOFENCE_TRANSITION_ENTER) {
+            title = "주변에 메시지가 있습니다.";
+            Log.e("haha", "메시지를 확인해주세요!");
+        }
+        if(transitiontype == Geofence.GEOFENCE_TRANSITION_DWELL) {
+            title = "주변에 메시지가 있습니다.";
+            Log.e("haha", "메시지를 확인해주세요! ");
+        }
+        if(transitiontype == Geofence.GEOFENCE_TRANSITION_EXIT) {
+            title = "주변에 메시지와 멀어지고 있습니다.";
+//            Log.e("haha", "Exit from " + IDs+event.getTriggeringLocation().getLatitude() + ""+event.getTriggeringLocation().getLongitude());
+        }
+
+
         // Define the notification settings.
         builder.setSmallIcon(R.drawable.ic_stat_ic_notification)
                 // In a real app, you may want to use a library like Volley
@@ -141,8 +157,8 @@ public class GeofenceTransitionsIntentService extends IntentService {
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(),
                         R.drawable.ic_stat_ic_notification))
                 .setColor(Color.RED)
-                .setContentTitle("geofence")
-                .setContentText("geofence")
+                .setContentTitle(title)
+                .setContentText(content)
                 .setContentIntent(notificationPendingIntent);
 
         // Set the Channel ID for Android O.
