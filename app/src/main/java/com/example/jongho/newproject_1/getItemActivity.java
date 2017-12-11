@@ -1,6 +1,7 @@
 package com.example.jongho.newproject_1;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -49,6 +50,10 @@ public class getItemActivity extends AppCompatActivity
     private FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase mFireDB = FirebaseDatabase.getInstance();
 
+    EditText edittitle;
+    EditText editcontent;
+    EditText edittime;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,8 +78,6 @@ public class getItemActivity extends AppCompatActivity
             }
         });
 
-
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,14 +98,46 @@ public class getItemActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
+    public void onStart() {
+        super.onStart();
+
+        // SharedPreferences 사용
+        SharedPreferences sharedPreferences = getSharedPreferences("prefItemData", MODE_PRIVATE);
+
+        edittitle = (EditText)findViewById(R.id.edit_Gettitle);
+        edittitle.setText(sharedPreferences.getString("edit_Gettitle", ""));
+        editcontent = (EditText)findViewById(R.id.edit_Getcontent);
+        editcontent.setText(sharedPreferences.getString("edit_Getcontent", ""));
+        edittime = (EditText)findViewById(R.id.edit_Gettime);
+        edittime.setText(sharedPreferences.getString("edit_Gettime",""));
+    }
+
+    public void onStop() {
+        super.onStop();
+
+        // SharedPreferences 사용
+        edittitle = (EditText)findViewById(R.id.edit_Gettitle);
+        editcontent = (EditText)findViewById(R.id.edit_Getcontent);
+        edittime = (EditText)findViewById(R.id.edit_Gettime);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("prefItemData", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putString("edit_Gettitle", edittitle.getText().toString());
+        editor.putString("edit_Getcontent", editcontent.getText().toString());
+        editor.putString("edit_Gettime", edittime.getText().toString());
+
+        editor.commit();
+    }
+
     // DB에 아이템 저장
     public void saveGetItem(View v) {
         Intent getIntent = getIntent();
 
         // 입력창
-        EditText edittitle = (EditText)findViewById(R.id.edit_Gettitle);
-        EditText editcontent = (EditText)findViewById(R.id.edit_Getcontent);
-        EditText edittime = (EditText)findViewById(R.id.edit_Gettime);
+        edittitle = (EditText)findViewById(R.id.edit_Gettitle);
+        editcontent = (EditText)findViewById(R.id.edit_Getcontent);
+        edittime = (EditText)findViewById(R.id.edit_Gettime);
 
         // 저장할 정보
         double i = 0;

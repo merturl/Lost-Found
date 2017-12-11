@@ -1,6 +1,7 @@
 package com.example.jongho.newproject_1;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -41,6 +42,10 @@ public class LostItemActivity extends AppCompatActivity {
     private FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase mFireDB = FirebaseDatabase.getInstance();
 
+    EditText edittitle;
+    EditText editcontent;
+    EditText edittime;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,8 +79,40 @@ public class LostItemActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        SharedPreferences sharedPreferences = getSharedPreferences("prefItemData", MODE_PRIVATE);
+
+        EditText edittitle = (EditText)findViewById(R.id.edit_Losttitle);
+        EditText editcontent = (EditText)findViewById(R.id.edit_Lostcontent);
+        EditText edittime = (EditText)findViewById(R.id.edit_Losttime);
+
+        edittitle.setText(sharedPreferences.getString("edit_Losttitle",""));
+        editcontent.setText(sharedPreferences.getString("edit_Lostcontent",""));
+        edittime.setText(sharedPreferences.getString("edit_Losttime",""));
+
+
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
+
+
+        // SharedPreferences 사용
+        EditText edittitle = (EditText)findViewById(R.id.edit_Losttitle);
+        EditText editcontent = (EditText)findViewById(R.id.edit_Lostcontent);
+        EditText edittime = (EditText)findViewById(R.id.edit_Losttime);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("prefItemData", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putString("edit_Losttitle", edittitle.getText().toString());
+        editor.putString("edit_Lostcontent", editcontent.getText().toString());
+        editor.putString("edit_Losttime", edittime.getText().toString());
+
+        editor.commit();
 
     }
 

@@ -1,6 +1,7 @@
 package com.example.jongho.newproject_1;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -51,6 +52,10 @@ public class SetItemViewActivity extends AppCompatActivity {
     private Bitmap bitmap;
     private ImageView imageViewgetItem;
 
+    EditText title;
+    EditText content;
+    EditText time;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +68,10 @@ public class SetItemViewActivity extends AppCompatActivity {
         checkPerssions();
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
+        Intent getintent = getIntent();
+        final String DbRef = getintent.getStringExtra("DbRef");
+        final String ImageRef = getintent.getStringExtra("ImageRef");
+
         //imgview에 리스너를 달아 이미지뷰 클릭시 이미지 추가를 함
         imageViewgetItem = (ImageView) findViewById(R.id.imgv_setitem);
         imageViewgetItem.setOnClickListener(new View.OnClickListener() {
@@ -74,10 +83,12 @@ public class SetItemViewActivity extends AppCompatActivity {
             }
         });
 
-        Intent getintent = getIntent();
-        final String DbRef = getintent.getStringExtra("DbRef");
-        final String ImageRef = getintent.getStringExtra("ImageRef");
-
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+        StorageReference storageReference = mStorageRef.child(ImageRef+ ".jpg");
+        Glide.with(SetItemViewActivity.this)
+                .using(new FirebaseImageLoader())
+                .load(storageReference)
+                .into(imageViewgetItem);
 
 
         mFireDB.getReference(DbRef)
@@ -94,15 +105,22 @@ public class SetItemViewActivity extends AppCompatActivity {
                         }
 
 
-                        EditText title = (EditText) findViewById(R.id.edit_ItemTitle);
-                        EditText content = (EditText) findViewById(R.id.edit_ItemContent);
-                        EditText time = (EditText) findViewById(R.id.edit_ItemTime);
+                        title = (EditText) findViewById(R.id.edit_ItemTitle);
+                        content = (EditText) findViewById(R.id.edit_ItemContent);
+                        time = (EditText) findViewById(R.id.edit_ItemTime);
                         ImageView imgview = (ImageView)findViewById(R.id.imgv_setitem);
 
-                        // text Item
                         title.setText(item.getTitle());
                         content.setText(item.getContent());
                         time.setText(item.getTime());
+
+//                        // SharedPreferences 사용,
+//                        SharedPreferences sharedPreferences = getSharedPreferences("prefItemData", MODE_PRIVATE);
+//
+//                        // 기록이 남아있으면 SharedPreferences에서, 아니라면 기존의 데이터로 초기화화
+//                        title.setText(sharedPreferences.getString("edit_ItemTitle", item.getTitle()));
+//                        content.setText(sharedPreferences.getString("edit_ItemContent",item.getContent()));
+//                        time.setText(sharedPreferences.getString("edit_ItemTime",item.getTime()));
 
                         Log.d("acac", "storageRef=="+ storageReference);
                         // Load the image using Glide
@@ -125,6 +143,23 @@ public class SetItemViewActivity extends AppCompatActivity {
                 });
     }
 
+    public void onStop() {
+        super.onStop();
+
+//        title = (EditText) findViewById(R.id.edit_ItemTitle);
+//        content = (EditText) findViewById(R.id.edit_ItemContent);
+//        time = (EditText) findViewById(R.id.edit_ItemTime);
+//
+//        // SharedPreferences 사용,
+//        SharedPreferences sharedPreferences = getSharedPreferences("prefItemData", MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.putString("edit_ItemTitle",title.getText().toString());
+//        editor.putString("edit_ItemContent",content.getText().toString());
+//        editor.putString("edit_ItemTime",time.getText().toString());
+//
+//        editor.commit();
+    }
+
     public void EditItem(final String Ref, final String ImageRef, final Item item) {
         Log.d("acac", "///////////In EditItem ///////// ");
         Log.d("acac", "DbRef == " + Ref);
@@ -144,7 +179,7 @@ public class SetItemViewActivity extends AppCompatActivity {
 
         Log.d("acac", "item.getTitle == " + item.getTitle());
 
-        // 저장 버튼 클릭시
+        // Edit 버튼 클릭시
         BtnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -168,7 +203,7 @@ public class SetItemViewActivity extends AppCompatActivity {
                 mFireRef.updateChildren(itemUpdates);
 
                 // 이미지 저장
-                StorageReference reference = mStorageRef.child(ImageRef);
+                StorageReference reference = mStorageRef.child(ImageRef+".jpg");
                 Log.d("acac", "reference" + reference);
                 //파이어베이스에 쓰이는 데이터로 이미지 변환
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -176,21 +211,27 @@ public class SetItemViewActivity extends AppCompatActivity {
                 try {
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                 } catch (NullPointerException e) {
+                    Log.d("acac", "baos== " + baos);
                     return;
                 }
                 byte[] data = baos.toByteArray();
                 Log.d("acac", "data== " + data);
 
                 UploadTask uploadTask = reference.putBytes(data);
+                if(uploadTask == null ){
+                    finish();
+                }
                 uploadTask.addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
                         // Handle unsuccessful uploads
+                        Log.d("acac", "ADDoNfAILURER ");
                         finish();
                     }
                 }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Log.d("acac", "in listenr");
                         // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
                         Uri downloadUrl = taskSnapshot.getDownloadUrl(); //이미지가 저장된 주소의 URL
 

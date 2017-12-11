@@ -656,10 +656,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         Log.d("acac", "MarkerId="+tag.get("MarkerId").toString());
                         startActivity(ItemView);
                         return true;
+
                     }
                 }
             }
         });
+        overridePendingTransition(R.anim.anim_slide_in_right, R.anim.anim_slide_out_left);
 
         this.googleMap.setOnMapClickListener(this);
     }
