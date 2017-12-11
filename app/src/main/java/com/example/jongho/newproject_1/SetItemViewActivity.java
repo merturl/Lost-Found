@@ -72,11 +72,13 @@ public class SetItemViewActivity extends AppCompatActivity {
         final String DbRef = getintent.getStringExtra("DbRef");
         final String ImageRef = getintent.getStringExtra("ImageRef");
 
+        Log.d("pp", "DbRef="+DbRef);
         //imgview에 리스너를 달아 이미지뷰 클릭시 이미지 추가를 함
         imageViewgetItem = (ImageView) findViewById(R.id.imgv_setitem);
         imageViewgetItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d("pp", "inClick");
                 //이미지 선택할 수 있는 엑티비티 창 호출
                 Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(intent, 1);
@@ -98,6 +100,7 @@ public class SetItemViewActivity extends AppCompatActivity {
                         mStorageRef = FirebaseStorage.getInstance().getReference();
                         StorageReference storageReference = mStorageRef.child(ImageRef+ ".jpg");
                         Log.d("acac", "addValueEventListener"+ storageReference);
+                        Log.d("pp", "storageRef="+storageReference);
 
                         Item item = dataSnapshot.getValue(Item.class);
                         if(  item.getTitle().matches("") ) {
@@ -109,20 +112,14 @@ public class SetItemViewActivity extends AppCompatActivity {
                         content = (EditText) findViewById(R.id.edit_ItemContent);
                         time = (EditText) findViewById(R.id.edit_ItemTime);
                         ImageView imgview = (ImageView)findViewById(R.id.imgv_setitem);
+                        Log.d("pp", "imgview");
 
                         title.setText(item.getTitle());
                         content.setText(item.getContent());
                         time.setText(item.getTime());
 
-//                        // SharedPreferences 사용,
-//                        SharedPreferences sharedPreferences = getSharedPreferences("prefItemData", MODE_PRIVATE);
-//
-//                        // 기록이 남아있으면 SharedPreferences에서, 아니라면 기존의 데이터로 초기화화
-//                        title.setText(sharedPreferences.getString("edit_ItemTitle", item.getTitle()));
-//                        content.setText(sharedPreferences.getString("edit_ItemContent",item.getContent()));
-//                        time.setText(sharedPreferences.getString("edit_ItemTime",item.getTime()));
-
                         Log.d("acac", "storageRef=="+ storageReference);
+                        Log.d("pp", "storageRef=="+storageReference);
                         // Load the image using Glide
                         Glide.with(SetItemViewActivity.this)
                                 .using(new FirebaseImageLoader())
@@ -161,10 +158,8 @@ public class SetItemViewActivity extends AppCompatActivity {
     }
 
     public void EditItem(final String Ref, final String ImageRef, final Item item) {
-        Log.d("acac", "///////////In EditItem ///////// ");
-        Log.d("acac", "DbRef == " + Ref);
-        Log.d("acac", "ImageRef == " + ImageRef);
-        Log.d("acac", "Item.getTitle() == " + item.getTitle());
+        Log.d("pp", "///////////In EditItem ///////// ");
+
 
         final EditText etitle = (EditText) findViewById(R.id.edit_ItemTitle);
         final EditText econtent = (EditText) findViewById(R.id.edit_ItemContent);
@@ -183,6 +178,7 @@ public class SetItemViewActivity extends AppCompatActivity {
         BtnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d("pp", "///////////In BTN ONCLICK ///////// ");
                 Toast.makeText(SetItemViewActivity.this, "Hi btn", Toast.LENGTH_SHORT).show();
 
                 EditText title = (EditText) findViewById(R.id.edit_ItemTitle);
@@ -207,15 +203,16 @@ public class SetItemViewActivity extends AppCompatActivity {
                 Log.d("acac", "reference" + reference);
                 //파이어베이스에 쓰이는 데이터로 이미지 변환
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                Log.d("acac", "baos== " + baos);
+                Log.d("acac", "baos== " + baos.toString());
+                Log.d("pp", "baos== " + baos.toString());
                 try {
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                 } catch (NullPointerException e) {
-                    Log.d("acac", "baos== " + baos);
-                    return;
+                    Log.d("pp", "baos== " + baos.toString());
+                    finish();
                 }
                 byte[] data = baos.toByteArray();
-                Log.d("acac", "data== " + data);
+                Log.d("pp", "data== " + data);
 
                 UploadTask uploadTask = reference.putBytes(data);
                 if(uploadTask == null ){
@@ -239,6 +236,7 @@ public class SetItemViewActivity extends AppCompatActivity {
                         Log.d("DB", "success listiner" + item.getContent());
 //                        uploadImage(ImageRef);
                         Toast.makeText(SetItemViewActivity.this, "이미지 저장 성공", Toast.LENGTH_SHORT).show();
+                        Log.d("pp", "success " );
                         finish();
                     }
                 });
@@ -280,7 +278,7 @@ public class SetItemViewActivity extends AppCompatActivity {
     //파이어스토어에 이미지 저장
     public void uploadImage(final String ImageRef){
         Log.d("DB","uploadImage start");
-        Log.d("acac","/////////in upload///////// ");
+        Log.d("pp","/////////in upload///////// ");
         Log.d("acac","ImageRef== " + ImageRef);
         if(ImageRef == null ) {
             return;
@@ -419,13 +417,14 @@ public class SetItemViewActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("acac", "/////////onActivityResult/////////");
+        Log.d("pp", "/////////onActivityResult/////////");
 
         if(requestCode ==1 ){
             if ( data == null) {
                 Toast.makeText(this, "Sorry, Don't find image", Toast.LENGTH_SHORT).show();
             } else {
                 //img를 받기 위한 Uri
+                Log.d("pp", "uridata="+data.getData().toString());
                 Uri image = data.getData();
                 Log.d("acac", "image=== " +image);
                 Log.i(image.toString(), "select image////"+image.toString());

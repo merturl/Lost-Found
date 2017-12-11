@@ -153,6 +153,15 @@ public class getItemActivity extends AppCompatActivity
             String content = editcontent.getText().toString();
             String time = edittime.getText().toString();
 
+            //파이어베이스에 쓰이는 데이터로 이미지 변환
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try {
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            } catch ( NullPointerException e ) {
+                Toast.makeText(this, "Don't image", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             // 아이템 저장 lat, lng,  title, content, time
             Item saveitem = new Item(true, lat, lng, title, content);
             DatabaseReference mFireRef = mFireDB.getReference("Item/"+mFirebaseAuth.getCurrentUser().getUid()).push();
