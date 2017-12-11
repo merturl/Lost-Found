@@ -18,7 +18,7 @@ public class Message {
         this.to =to;
         this.from=from;
         this.msg =msg;
-        this.send = true;
+        this.send = false;
     }
 
     public String getTo() {
