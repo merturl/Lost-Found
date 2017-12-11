@@ -13,11 +13,11 @@
         android:layout_width="388dp"
         android:layout_height="191dp"
         android:layout_marginBottom="320dp"
+        android:background="#EEEEEE"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/star_on"
         tools:ignore="MissingConstraints"
         android:contentDescription="@string/app_name"/>
 
@@ -35,18 +35,18 @@
             android:id="@+id/text_ItemTitle"
             android:layout_width="match_parent"
             android:layout_height="37dp"
-            android:text="TextView" />
+            android:text="Title" />
 
         <TextView
             android:id="@+id/text_ItemTime"
             android:layout_width="match_parent"
             android:layout_height="33dp"
-            android:text="TextView" />
+            android:text="Time" />
 
         <TextView
             android:id="@+id/text_ItemContent"
             android:layout_width="match_parent"
             android:layout_height="180dp"
-            android:text="TextView" />
+            android:text="Content" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

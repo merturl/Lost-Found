@@ -17,7 +17,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/star_on"
+        android:background="#EEEEEE"
         tools:ignore="MissingConstraints"
         android:contentDescription="@string/app_name"/>
 

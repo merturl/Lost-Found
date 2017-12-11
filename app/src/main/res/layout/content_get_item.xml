@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_marginTop="10dp"
-            android:background="#eeeeee"
+            android:background="#EEEEEE"
             android:contentDescription="이미지를 넣어주세요" />
 
 
@@ -70,18 +70,18 @@
 
         <Button
             android:id="@+id/btnGetItem"
-            android:layout_width="wrap_content"
+            android:layout_width="350dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="296dp"
+            android:layout_marginLeft="17dp"
+            android:backgroundTint="@color/cast_expanded_controller_background_color"
             android:onClick="saveGetItem"
             android:text="GET IT"
+            android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/edit_Gettime"
-            tools:ignore="MissingConstraints"
-            android:textColor="@color/white"
-            android:backgroundTint="@color/cast_expanded_controller_background_color"/>
+            tools:ignore="MissingConstraints" />
 
 
     </LinearLayout>

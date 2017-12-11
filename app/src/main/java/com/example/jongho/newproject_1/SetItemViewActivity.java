@@ -1,15 +1,12 @@
 package com.example.jongho.newproject_1;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -19,15 +16,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -39,10 +33,8 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.sql.Ref;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class SetItemViewActivity extends AppCompatActivity {
     // Firebase 객체 생성
@@ -179,7 +171,6 @@ public class SetItemViewActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.d("pp", "///////////In BTN ONCLICK ///////// ");
-                Toast.makeText(SetItemViewActivity.this, "Hi btn", Toast.LENGTH_SHORT).show();
 
                 EditText title = (EditText) findViewById(R.id.edit_ItemTitle);
                 EditText content = (EditText) findViewById(R.id.edit_ItemContent);
@@ -235,7 +226,7 @@ public class SetItemViewActivity extends AppCompatActivity {
                         Log.d("acac", "onSucess== " + item.getTitle());
                         Log.d("DB", "success listiner" + item.getContent());
 //                        uploadImage(ImageRef);
-                        Toast.makeText(SetItemViewActivity.this, "이미지 저장 성공", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SetItemViewActivity.this, "저장 성공", Toast.LENGTH_SHORT).show();
                         Log.d("pp", "success " );
                         finish();
                     }
@@ -258,7 +249,6 @@ public class SetItemViewActivity extends AppCompatActivity {
 
         StorageReference reference = mStorageRef.child(ImageRef+".jpg");
         Log.d("Image","Image == " + ImageRef+".jpg");
-        Toast.makeText(this, "Image == " + ImageRef+".jpg", Toast.LENGTH_LONG).show();
         reference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {

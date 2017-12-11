@@ -66,13 +66,13 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/edit_content"
             tools:ignore="LabelFor,MissingConstraints" />
-
+btnLostItem
         <Button
             android:id="@+id/btnLostItem"
             android:onClick="saveLostItem"
-            android:layout_width="wrap_content"
+            android:layout_width="350dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="296dp"
+            android:layout_marginLeft="17dp"
             android:text="Button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
