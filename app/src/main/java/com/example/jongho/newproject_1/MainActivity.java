@@ -26,7 +26,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -75,6 +75,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+
     //PerMissionCode
     private static final int REQUEST_PERMISSIONS_LOCATION_SETTINGS_REQUEST_CODE = 33;
     private static final int REQUEST_PERMISSIONS_LAST_LOCATION_REQUEST_CODE = 34;
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Marker currentMarker;
     Marker addMarker;
 
-    private EditText addr;
+    private TextView addr;
 
     public static SQLiteDatabase mDB;
     private Cursor mCursor;
@@ -132,24 +133,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Intent tutorial;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Log.i("haha", "oncreate");
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_main);
+            Log.i("haha", "oncreate");
 
-        //init SearchAddress data record
-        //fuseLocationClient init
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        geofencingClient = LocationServices.getGeofencingClient(this);
-        mGeofenceList = new ArrayList<Geofence>();
-        search = new Intent(this, SearchActivity.class);
-        contracts = new Intent(this, ContractsActivity.class);
-        tutorial = new Intent(this, TutorialActivity.class);
+            //init SearchAddress data record
+            //fuseLocationClient init
+            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            geofencingClient = LocationServices.getGeofencingClient(this);
+            mGeofenceList = new ArrayList<Geofence>();
+            search = new Intent(this, SearchActivity.class);
+            contracts = new Intent(this, ContractsActivity.class);
+            tutorial = new Intent(this, TutorialActivity.class);
 
-        //checkforlocation
-        checkForLocationRequest();
-        checkForLocationSettings();
-        createLocationCallBack();
+            //checkforlocation
+            checkForLocationRequest();
+            checkForLocationSettings();
+            createLocationCallBack();
 
         initDB();
 
@@ -157,7 +158,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Init googleMap
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
     }
 
     @Override
@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     public void initDB() {
-        addr = (EditText) findViewById(R.id.addr);
+        addr = (TextView) findViewById(R.id.addr);
         Button tran = (Button) findViewById(R.id.tran);
 
         // DB를 위한 부분
@@ -199,6 +199,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         tran.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (mFusedLocationClient != null) {
+                    mFusedLocationClient.removeLocationUpdates(locationCallback).addOnCompleteListener(MainActivity.this, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            mFusedLocationClient = null;
+                        }
+                    });
+                }
                 startActivityForResult(search, 0);
             }
         });

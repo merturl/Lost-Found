@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <EditText
+        <TextView
             android:id="@+id/addr"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
