@@ -5,7 +5,7 @@ Geofencing-based Inventory Search Service
 + Android(Client) <br />
 Map,GPS,Service, Geofence, FCM, Notification, ContentProvider, Broadcast Receiver, SQLite, Menu, Preference, Web, GoogleLoginAPI
 + Firebase(DB) <br />
-FireStroe, Firebase, LoginApi
+FireStroe, Firebase, LoginApi.
 + Nodejs(Server)<br />
 
 # URL
